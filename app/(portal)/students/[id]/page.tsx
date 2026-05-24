@@ -28,17 +28,23 @@ const tabs: { id: Tab; label: string }[] = [
 // ---- Activity Tab ----
 
 function ActivityItemRow({ item }: { item: ActivityItem }) {
-  const itemNames = item.items.map((i) => `${i.name} x${i.qty}`).join(", ");
+  const itemNames = item.items.map((i) => `${i.name} x${i.quantity}`).join(", ");
   return (
     <tr className="border-b border-border last:border-0">
-      <td className="py-3 pr-4 text-sm text-muted-foreground">
+      <td className="px-4 py-3 text-sm text-muted-foreground">
         {formatDate(item.created_at)}
       </td>
-      <td className="py-3 pr-4 text-sm">{itemNames}</td>
-      <td className="py-3 pr-4 text-sm capitalize">
-        {item.payment_method === "wallet" ? "Wallet" : "Cash"}
+      <td className="px-4 py-3 text-sm">{itemNames}</td>
+      <td className="px-4 py-3 text-sm">
+        {item.payment_method === "wallet"
+          ? "Wallet"
+          : item.payment_method === "subscription"
+            ? "Subscription"
+            : item.payment_method === "gcash"
+              ? "GCash"
+              : "Cash"}
       </td>
-      <td className="py-3 text-right text-sm font-semibold tabular-nums">
+      <td className="px-4 py-3 text-right text-sm font-semibold tabular-nums">
         {formatPHP(item.total)}
       </td>
     </tr>
@@ -90,7 +96,7 @@ function ActivityTab({ studentId }: { studentId: number }) {
         <p className="text-sm text-muted-foreground">
           Total spent:{" "}
           <span className="font-semibold text-foreground tabular-nums">
-            {formatPHP(data.total_spent)}
+            {formatPHP(data.spending_total)}
           </span>
         </p>
         <p className="text-xs text-muted-foreground">
@@ -102,16 +108,16 @@ function ActivityTab({ studentId }: { studentId: number }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/50">
-              <th className="py-3 pr-4 text-left text-xs font-medium text-muted-foreground">
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
                 Date
               </th>
-              <th className="py-3 pr-4 text-left text-xs font-medium text-muted-foreground">
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
                 Items
               </th>
-              <th className="py-3 pr-4 text-left text-xs font-medium text-muted-foreground">
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
                 Method
               </th>
-              <th className="py-3 text-right text-xs font-medium text-muted-foreground">
+              <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">
                 Total
               </th>
             </tr>
@@ -157,13 +163,13 @@ function TransactionRow({ tx }: { tx: Transaction }) {
   const isCredit = tx.amount >= 0;
   return (
     <tr className="border-b border-border last:border-0">
-      <td className="py-3 pr-4 text-sm text-muted-foreground">
+      <td className="px-4 py-3 text-sm text-muted-foreground">
         {formatDate(tx.created_at)}
       </td>
-      <td className="py-3 pr-4 text-sm">{tx.description}</td>
+      <td className="px-4 py-3 text-sm capitalize">{tx.type}</td>
       <td
         className={cn(
-          "py-3 text-right text-sm font-semibold tabular-nums",
+          "px-4 py-3 text-right text-sm font-semibold tabular-nums",
           isCredit ? "text-green-600 dark:text-green-400" : "text-destructive"
         )}
       >
@@ -298,7 +304,7 @@ function WalletTab({ studentId }: { studentId: number }) {
       {/* Recent transactions */}
       <div>
         <h3 className="mb-3 text-sm font-semibold">Recent Transactions</h3>
-        {data.recent_transactions.length === 0 ? (
+        {data.data.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border p-8 text-center">
             <p className="text-sm text-muted-foreground">No transactions yet.</p>
           </div>
@@ -307,19 +313,19 @@ function WalletTab({ studentId }: { studentId: number }) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted/50">
-                  <th className="py-3 pr-4 text-left text-xs font-medium text-muted-foreground">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
                     Date
                   </th>
-                  <th className="py-3 pr-4 text-left text-xs font-medium text-muted-foreground">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
                     Description
                   </th>
-                  <th className="py-3 text-right text-xs font-medium text-muted-foreground">
+                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">
                     Amount
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-card">
-                {data.recent_transactions.map((tx) => (
+                {data.data.map((tx) => (
                   <TransactionRow key={tx.id} tx={tx} />
                 ))}
               </tbody>

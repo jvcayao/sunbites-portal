@@ -10,9 +10,9 @@ interface AuthState {
   logout: () => void;
 }
 
-// Token lives in memory only — cleared on every page reload.
-// Parent metadata is persisted in sessionStorage for display purposes only
-// (UI decoration). The API always enforces auth via the in-memory token.
+// Token and parent are persisted in sessionStorage so page refreshes don't
+// force re-login. sessionStorage is cleared when the tab closes, which
+// limits the exposure window compared to localStorage.
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -24,8 +24,6 @@ export const useAuthStore = create<AuthState>()(
     {
       name: "sunbites-portal-auth",
       storage: createJSONStorage(() => sessionStorage),
-      // Persist parent metadata only — never persist the token
-      partialize: (state) => ({ parent: state.parent }),
     }
   )
 );

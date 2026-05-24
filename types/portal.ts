@@ -27,9 +27,9 @@ export interface DashboardData {
 
 export interface ActivityItem {
   id: number;
-  items: { name: string; qty: number; price: number }[];
+  items: { name: string; quantity: number; price: number; line_total: number }[];
   total: number;
-  payment_method: "wallet" | "cash";
+  payment_method: "wallet" | "cash" | "gcash" | "subscription";
   created_at: string;
 }
 
@@ -43,31 +43,35 @@ export interface PaginatedMeta {
 export interface ActivityResponse {
   data: ActivityItem[];
   meta: PaginatedMeta;
-  total_spent: number;
+  spending_total: number;
 }
 
 export interface Transaction {
   id: number;
   type: string;
   amount: number;
-  description: string;
+  meta: Record<string, unknown> | null;
   created_at: string;
 }
 
 export interface WalletData {
   balance: number;
   wallet_alert_threshold: number;
-  recent_transactions: Transaction[];
+  data: Transaction[];
+  meta: PaginatedMeta;
 }
 
-export interface MealPlanDay {
-  day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday";
-  meals: { type: "AM Snack" | "Lunch" | "PM Snack"; name: string; price: number }[];
+export interface MealPlanGridItem {
+  day: string;
+  day_label: string;
+  ulam: string;
+  vegetables: string;
+  fruit: string;
+  soup: string;
 }
 
 export interface MealPlanData {
-  week_start: string;
-  days: MealPlanDay[];
+  grid: MealPlanGridItem[];
 }
 
 export interface FeedbackItem {

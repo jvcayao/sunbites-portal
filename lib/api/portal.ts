@@ -21,7 +21,7 @@ export const profileApi = {
     last_name: string;
     phone: string;
     address: string;
-  }) => apiClient.put<AuthParent>("/portal/profile", payload),
+  }) => apiClient.patch<AuthParent>("/portal/profile", payload),
 
   changePassword: (payload: {
     current_password: string;
@@ -69,8 +69,8 @@ export const studentsApi = {
     apiClient.get<WalletData>(`/portal/students/${id}/wallet`),
 
   setAlert: (id: number, threshold: number) =>
-    apiClient.post<{ message: string }>(
-      `/portal/students/${id}/wallet/set-alert`,
+    apiClient.patch<{ message: string }>(
+      `/portal/students/${id}/wallet/alert`,
       { threshold }
     ),
 };
@@ -78,7 +78,7 @@ export const studentsApi = {
 // --- Meal Plan ---
 
 export const mealPlanApi = {
-  get: () => apiClient.get<MealPlanData>("/portal/meal-plan"),
+  get: () => apiClient.get<MealPlanData>("/portal/meal-planner"),
 };
 
 // --- Feedback ---
@@ -97,12 +97,12 @@ export const feedbackApi = {
 
 export const portalAuthApi = {
   forgotPassword: (email: string) =>
-    apiClient.post<{ message: string }>("/portal/auth/forgot-password", { email }),
+    apiClient.post<{ message: string }>("/portal/auth/password/email", { email }),
 
   resetPassword: (payload: {
     token: string;
     email: string;
     password: string;
     password_confirmation: string;
-  }) => apiClient.post<{ message: string }>("/portal/auth/reset-password", payload),
+  }) => apiClient.post<{ message: string }>("/portal/auth/password/reset", payload),
 };

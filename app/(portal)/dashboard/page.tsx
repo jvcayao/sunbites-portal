@@ -2,15 +2,10 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { Wallet } from "lucide-react";
+import { ArrowRight, ShoppingBag, Wallet } from "lucide-react";
 
 import { EnrollmentStatusBadge } from "@/components/enrollment-status-badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { dashboardApi } from "@/lib/api/portal";
 import { formatDate, formatPHP } from "@/lib/format";
@@ -19,61 +14,82 @@ import type { RecentOrder, StudentSummary } from "@/types/portal";
 
 function StudentCardSkeleton() {
   return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-5 w-40" />
-        <Skeleton className="h-4 w-28" />
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-5 w-20" />
-      </CardContent>
-    </Card>
+    <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
+      <div className="flex items-start justify-between">
+        <Skeleton className="h-5 w-36" />
+        <Skeleton className="h-5 w-16 rounded-full" />
+      </div>
+      <Skeleton className="h-4 w-28" />
+      <div className="pt-2 border-t border-border">
+        <Skeleton className="h-7 w-24" />
+        <Skeleton className="h-3 w-16 mt-1" />
+      </div>
+    </div>
   );
 }
 
 function StudentCard({ student }: { student: StudentSummary }) {
+  const isSubscription = student.student_type === "subscription";
+
   return (
     <Link
       href={`/students/${student.id}`}
-      className="group block rounded-xl ring-1 ring-foreground/10 transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="group block rounded-2xl border border-border bg-card p-5 transition-all hover:shadow-md hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       aria-label={`View details for ${student.full_name}`}
     >
-      <Card className="h-full ring-0 transition-colors group-hover:bg-muted/30">
-        <CardHeader>
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle className="text-base">{student.full_name}</CardTitle>
-            <EnrollmentStatusBadge status={student.enrollment_status} />
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {student.grade_level} &middot; {student.branch_name}
-          </p>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-1.5 text-sm">
+      <div className="flex items-start justify-between gap-2 mb-1">
+        <p className="font-semibold text-base leading-tight">{student.full_name}</p>
+        <EnrollmentStatusBadge status={student.enrollment_status} />
+      </div>
+
+      <p className="text-sm text-muted-foreground mb-3">
+        {student.grade_level} &middot; {student.branch_name}
+      </p>
+
+      <div className="flex items-center gap-2 mb-4">
+        <span
+          className={
+            isSubscription
+              ? "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-700"
+              : "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-muted text-muted-foreground"
+          }
+        >
+          {isSubscription ? "Subscription" : "Non-Subscription"}
+        </span>
+      </div>
+
+      <div className="pt-3 border-t border-border flex items-end justify-between">
+        <div>
+          <div className="flex items-center gap-1.5">
             <Wallet className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-            <span className="font-medium">{formatPHP(student.wallet_balance)}</span>
-            <span className="text-muted-foreground">balance</span>
+            <span className="text-lg font-bold tabular-nums">
+              {formatPHP(student.wallet_balance)}
+            </span>
           </div>
-        </CardContent>
-      </Card>
+          <p className="text-xs text-muted-foreground mt-0.5">Wallet balance</p>
+        </div>
+        <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+      </div>
     </Link>
   );
 }
 
 function RecentOrderRow({ order }: { order: RecentOrder }) {
   return (
-    <tr className="border-b border-border last:border-0">
-      <td className="py-3 pr-4 text-sm font-medium">{order.student_full_name}</td>
-      <td className="py-3 pr-4 text-sm text-muted-foreground">
+    <tr className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+      <td className="px-4 py-3 text-sm font-medium">{order.student_full_name}</td>
+      <td className="px-4 py-3 text-sm text-muted-foreground">
         {formatDate(order.created_at)}
       </td>
-      <td className="py-3 pr-4 text-sm">
-        <span className="inline-flex items-center rounded-full border border-transparent px-2 py-0.5 text-xs font-medium capitalize">
+      <td className="px-4 py-3 text-sm">
+        <Badge
+          variant={order.payment_method === "wallet" ? "default" : "secondary"}
+          className="rounded-full text-xs capitalize"
+        >
           {order.payment_method === "wallet" ? "Wallet" : "Cash"}
-        </span>
+        </Badge>
       </td>
-      <td className="py-3 text-right text-sm font-semibold tabular-nums">
+      <td className="px-4 py-3 text-right text-sm font-semibold tabular-nums">
         {formatPHP(order.total)}
       </td>
     </tr>
@@ -87,7 +103,7 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -95,9 +111,9 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Students section */}
+      {/* Students */}
       <section aria-labelledby="students-heading">
-        <h2 id="students-heading" className="mb-4 text-lg font-semibold">
+        <h2 id="students-heading" className="mb-4 text-base font-semibold">
           Your Students
         </h2>
 
@@ -111,7 +127,7 @@ export default function DashboardPage() {
             Failed to load dashboard. Please refresh the page.
           </p>
         ) : !data?.students.length ? (
-          <div className="rounded-xl border border-dashed border-border p-8 text-center">
+          <div className="rounded-2xl border border-dashed border-border p-10 text-center">
             <p className="text-sm text-muted-foreground">
               No students linked to your account yet.
             </p>
@@ -125,42 +141,35 @@ export default function DashboardPage() {
         )}
       </section>
 
-      {/* Recent orders section */}
+      {/* Recent Orders */}
       <section aria-labelledby="orders-heading">
-        <h2 id="orders-heading" className="mb-4 text-lg font-semibold">
-          Recent Orders
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 id="orders-heading" className="text-base font-semibold">
+            Recent Orders
+          </h2>
+          <ShoppingBag className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+        </div>
 
         {isLoading ? (
           <div className="space-y-2">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-12 w-full rounded-xl" />)}
           </div>
         ) : error ? null : !data?.recent_orders.length ? (
-          <div className="rounded-xl border border-dashed border-border p-8 text-center">
+          <div className="rounded-2xl border border-dashed border-border p-10 text-center">
             <p className="text-sm text-muted-foreground">No recent orders.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-border">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted/50">
-                  <th className="py-3 pr-4 text-left text-xs font-medium text-muted-foreground">
-                    Student
-                  </th>
-                  <th className="py-3 pr-4 text-left text-xs font-medium text-muted-foreground">
-                    Date
-                  </th>
-                  <th className="py-3 pr-4 text-left text-xs font-medium text-muted-foreground">
-                    Method
-                  </th>
-                  <th className="py-3 text-right text-xs font-medium text-muted-foreground">
-                    Total
-                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Student</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Date</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Method</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Total</th>
                 </tr>
               </thead>
-              <tbody className="bg-card px-4">
+              <tbody>
                 {data.recent_orders.map((order) => (
                   <RecentOrderRow key={order.id} order={order} />
                 ))}
