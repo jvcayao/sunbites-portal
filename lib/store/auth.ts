@@ -10,6 +10,9 @@ interface AuthState {
   logout: () => void;
 }
 
+// Token and parent are persisted in sessionStorage so page refreshes don't
+// force re-login. sessionStorage is cleared when the tab closes, which
+// limits the exposure window compared to localStorage.
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({

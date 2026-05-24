@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
@@ -32,6 +33,7 @@ export default function LoginPage() {
     password: "",
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [notActivated, setNotActivated] = useState(false);
 
   const mutation = useMutation({
     mutationFn: authApi.login,
@@ -40,12 +42,18 @@ export default function LoginPage() {
       router.push("/dashboard");
     },
     onError: (error: ApiError) => {
+      if (error.error === "account_not_activated") {
+        setNotActivated(true);
+        return;
+      }
+      setNotActivated(false);
       toast.error(error.message ?? "Login failed. Please try again.");
     },
   });
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setNotActivated(false);
 
     const result = loginSchema.safeParse(values);
     if (!result.success) {
@@ -65,6 +73,12 @@ export default function LoginPage() {
           Sign in to your account
         </p>
       </div>
+
+      {notActivated && (
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800/30 dark:bg-amber-900/20 dark:text-amber-400" role="alert">
+          Your account has not been activated yet. Check your email for an activation link.
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div className="space-y-1.5">
@@ -88,7 +102,15 @@ export default function LoginPage() {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="password">Password</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Password</Label>
+            <Link
+              href="/forgot-password"
+              className="text-xs text-muted-foreground underline-offset-4 hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
           <Input
             id="password"
             type="password"
