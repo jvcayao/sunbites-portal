@@ -20,18 +20,21 @@ import type { FeedbackItem } from "@/types/portal";
 // ---- Validation ----
 
 const CATEGORIES = [
-  "Food Quality",
-  "Service",
-  "Pricing",
-  "Cleanliness",
-  "Other",
+  { value: "FoodQuality", label: "Food Quality" },
+  { value: "Service", label: "Service" },
+  { value: "PortionSize", label: "Portion Size" },
+  { value: "Cleanliness", label: "Cleanliness" },
+  { value: "General", label: "General" },
 ] as const;
 
-type Category = (typeof CATEGORIES)[number];
+type CategoryValue = (typeof CATEGORIES)[number]["value"];
+
+const CATEGORY_VALUES = CATEGORIES.map((c) => c.value) as [CategoryValue, ...CategoryValue[]];
 
 const feedbackSchema = z.object({
   student_id: z.number().optional(),
-  category: z.enum(CATEGORIES, { error: "Please select a category" }),
+  category: z.enum(CATEGORY_VALUES, { error: "Please select a category" }),
+  rating: z.number({ error: "Please select a rating" }).min(1).max(5),
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
 
@@ -40,12 +43,16 @@ type FeedbackFormData = z.infer<typeof feedbackSchema>;
 // ---- Category badge ----
 
 const categoryColors: Record<string, string> = {
-  "Food Quality": "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  FoodQuality: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
   Service: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  Pricing: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  PortionSize: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
   Cleanliness: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-  Other: "bg-muted text-muted-foreground",
+  General: "bg-muted text-muted-foreground",
 };
+
+const categoryLabel: Record<string, string> = Object.fromEntries(
+  CATEGORIES.map((c) => [c.value, c.label])
+);
 
 function CategoryBadge({ category }: { category: string }) {
   return (
@@ -56,8 +63,41 @@ function CategoryBadge({ category }: { category: string }) {
         categoryColors[category] ?? "bg-muted text-muted-foreground"
       )}
     >
-      {category}
+      {categoryLabel[category] ?? category}
     </Badge>
+  );
+}
+
+function StarRating({
+  value,
+  onChange,
+  error,
+}: {
+  value: number | undefined;
+  onChange: (n: number) => void;
+  error?: string;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label>Rating</Label>
+      <div className="flex items-center gap-1" role="group" aria-label="Rating">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            aria-label={`${star} star${star > 1 ? "s" : ""}`}
+            onClick={() => onChange(star)}
+            className={cn(
+              "text-2xl leading-none transition-colors",
+              (value ?? 0) >= star ? "text-amber-400" : "text-muted-foreground/30 hover:text-amber-300"
+            )}
+          >
+            ★
+          </button>
+        ))}
+      </div>
+      {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
+    </div>
   );
 }
 
@@ -73,6 +113,7 @@ function FeedbackForm() {
   const [values, setValues] = useState<Partial<FeedbackFormData>>({
     student_id: undefined,
     category: undefined,
+    rating: undefined,
     message: "",
   });
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
@@ -81,7 +122,7 @@ function FeedbackForm() {
     mutationFn: feedbackApi.submit,
     onSuccess: () => {
       toast.success("Feedback submitted. Thank you!");
-      setValues({ student_id: undefined, category: undefined, message: "" });
+      setValues({ student_id: undefined, category: undefined, rating: undefined, message: "" });
       setFieldErrors({});
       queryClient.invalidateQueries({ queryKey: ["feedback"] });
     },
@@ -138,7 +179,7 @@ function FeedbackForm() {
               id="category-select"
               value={values.category ?? ""}
               onChange={(e) =>
-                setValues((v) => ({ ...v, category: e.target.value as Category }))
+                setValues((v) => ({ ...v, category: e.target.value as CategoryValue }))
               }
               aria-invalid={!!fieldErrors.category}
               aria-describedby={fieldErrors.category ? "category-error" : undefined}
@@ -149,8 +190,8 @@ function FeedbackForm() {
             >
               <option value="">Select a category…</option>
               {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
+                <option key={c.value} value={c.value}>
+                  {c.label}
                 </option>
               ))}
             </select>
@@ -160,6 +201,13 @@ function FeedbackForm() {
               </p>
             )}
           </div>
+
+          {/* Star Rating */}
+          <StarRating
+            value={values.rating}
+            onChange={(n) => setValues((v) => ({ ...v, rating: n }))}
+            error={fieldErrors.rating?.[0]}
+          />
 
           {/* Message */}
           <div className="space-y-1.5">
