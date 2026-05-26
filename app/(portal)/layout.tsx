@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { PortalLayout } from "@/components/layouts/portal-layout";
@@ -16,7 +16,7 @@ export default function PortalGroupLayout({
   const router = useRouter();
 
   useEffect(() => {
-    setMounted(true);
+    startTransition(() => setMounted(true));
   }, []);
 
   useEffect(() => {
