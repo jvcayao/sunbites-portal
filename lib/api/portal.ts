@@ -89,6 +89,7 @@ export const feedbackApi = {
   submit: (payload: {
     student_id?: number;
     category: string;
+    rating: number;
     message: string;
   }) => apiClient.post<FeedbackItem>("/portal/feedback", payload),
 };
