@@ -10,7 +10,7 @@ export interface StudentSummary {
   student_type: "subscription" | "non_subscription";
 }
 
-export interface StudentDetail extends StudentSummary {}
+export type StudentDetail = StudentSummary;
 
 export interface RecentOrder {
   id: number;

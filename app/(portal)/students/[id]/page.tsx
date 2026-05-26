@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -192,7 +192,7 @@ function WalletTab({ studentId }: { studentId: number }) {
 
   useEffect(() => {
     if (data && !alertEditing) {
-      setAlertInput(String(data.wallet_alert_threshold));
+      startTransition(() => setAlertInput(String(data.wallet_alert_threshold)));
     }
   }, [data, alertEditing]);
 
