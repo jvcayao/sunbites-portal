@@ -61,17 +61,21 @@ export interface WalletData {
   meta: PaginatedMeta;
 }
 
-export interface MealPlanGridItem {
+// --- Meal-planner response shape (GET /portal/meal-planner?month=&week=) ---
+
+export interface MealPlanDay {
   day: string;
   day_label: string;
-  ulam: string;
-  vegetables: string;
-  fruit: string;
-  soup: string;
+  ulam?: string | null;
+  vegetables?: string | null;
+  fruit?: string | null;
+  soup?: string | null;
+  snacks?: string | null;
 }
 
-export interface MealPlanData {
-  grid: MealPlanGridItem[];
+export interface MealPlanResponse {
+  visible_to_parents: boolean;
+  days: MealPlanDay[];
 }
 
 export interface FeedbackItem {
