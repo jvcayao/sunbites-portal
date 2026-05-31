@@ -6,7 +6,7 @@ import type {
   DashboardData,
   FeedbackItem,
   FeedbackResponse,
-  MealPlanData,
+  MealPlanResponse,
   StudentDetail,
   WalletData,
 } from "@/types/portal";
@@ -78,7 +78,10 @@ export const studentsApi = {
 // --- Meal Plan ---
 
 export const mealPlanApi = {
-  get: () => apiClient.get<MealPlanData>("/portal/meal-planner"),
+  get: (month: string, week: number) =>
+    apiClient.get<MealPlanResponse>("/portal/meal-planner", {
+      params: { month, week },
+    }),
 };
 
 // --- Feedback ---
