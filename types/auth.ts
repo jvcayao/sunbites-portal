@@ -5,7 +5,7 @@ export interface AuthParent {
   email: string;
   phone: string | null;
   address: string | null;
-  profile_photo_path: string | null;
+  profile_photo_url: string | null;
   created_at: string;
 }
 
