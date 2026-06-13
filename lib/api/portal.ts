@@ -10,6 +10,7 @@ import type {
   StudentDetail,
   WalletData,
 } from "@/types/portal";
+import type { PaymentHistoryEntry } from "@/types/notification";
 
 // --- Profile ---
 
@@ -73,6 +74,9 @@ export const studentsApi = {
       `/portal/students/${id}/wallet/alert`,
       { threshold }
     ),
+
+  paymentHistory: (id: number) =>
+    apiClient.get<{ data: PaymentHistoryEntry[] }>(`/portal/students/${id}/payment-history`),
 };
 
 // --- Meal Plan ---
