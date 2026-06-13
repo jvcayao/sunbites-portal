@@ -181,4 +181,34 @@ describe("NotificationsPage", () => {
 
     expect(timestamps.length).toBeGreaterThanOrEqual(1);
   });
+
+  it("shows the 'Today' date group header for notifications created today", async () => {
+    setupHandlers([paymentReminderFixture]);
+
+    render(<NotificationsPage />);
+
+    expect(await screen.findByText("Today")).toBeInTheDocument();
+  });
+
+  it("Unread tab filters to only unread notifications", async () => {
+    const readFixture = {
+      ...paymentReminderFixture,
+      id: "notif-read",
+      read_at: new Date().toISOString(),
+    };
+    setupHandlers([paymentReminderFixture, readFixture], 1);
+
+    render(<NotificationsPage />);
+
+    // Wait for All tab to load both items
+    await screen.findAllByText("Payment Reminder — August 2026");
+
+    // Switch to Unread tab
+    const unreadTab = screen.getByRole("tab", { name: /unread/i });
+    await userEvent.click(unreadTab);
+
+    // Unread tab should show only the unread notification (1 article)
+    const articles = screen.getAllByRole("article");
+    expect(articles).toHaveLength(1);
+  });
 });
