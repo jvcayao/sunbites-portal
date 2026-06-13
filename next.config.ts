@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // MSW's CJS build requires these ESM-only packages; list them so next/jest
+  // transpiles them during tests instead of failing on bare ESM syntax.
+  transpilePackages: [
+    "rettime",
+    "until-async",
+    "headers-polyfill",
+    "@open-draft/deferred-promise",
+  ],
   images: {
     remotePatterns: [
       // Local dev — MinIO at localhost:9000, bucket sunbites-dev
