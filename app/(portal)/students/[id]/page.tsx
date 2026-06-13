@@ -1,7 +1,7 @@
 "use client";
 
 import { startTransition, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -424,8 +424,10 @@ function StudentDetailSkeleton() {
 
 export default function StudentDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const studentId = Number(params.id);
-  const [activeTab, setActiveTab] = useState<Tab>("activity");
+  const initialTab = (searchParams.get("tab") as Tab | null) ?? "activity";
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 
   const { data: studentsData, isLoading: studentsLoading } = useQuery({
     queryKey: ["students"],

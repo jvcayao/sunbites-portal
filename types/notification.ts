@@ -2,7 +2,7 @@ export interface PaymentReminderData {
   school_month: string;
   school_year: number;
   due_date: string;
-  students: Array<{ name: string; amount: number }>;
+  students: Array<{ id?: number; name: string; amount: number }>;
   total_amount: number;
 }
 

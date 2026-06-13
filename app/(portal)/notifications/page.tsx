@@ -2,17 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Bell, CheckCheck, CreditCard, ExternalLink, Trash2 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bell, CheckCheck, Check, Trash2, MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,15 +15,28 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { NotificationItem } from "@/components/notification-item";
 import { notificationApi } from "@/lib/api/notifications";
-import { relativeTime } from "@/lib/relative-time";
 import { cn } from "@/lib/utils";
 
 import type { ParentNotification } from "@/types/notification";
 
+type Tab = "all" | "unread";
+
 // ---------------------------------------------------------------------------
-// Date grouping
+// Helpers
 // ---------------------------------------------------------------------------
 
 function groupByDate(
@@ -39,7 +45,6 @@ function groupByDate(
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startOfYesterday = new Date(startOfToday.getTime() - 86_400_000);
-
   return [
     { label: "Today", items: items.filter((n) => new Date(n.created_at) >= startOfToday) },
     {
@@ -50,155 +55,199 @@ function groupByDate(
           new Date(n.created_at) < startOfToday
       ),
     },
-    {
-      label: "Earlier",
-      items: items.filter((n) => new Date(n.created_at) < startOfYesterday),
-    },
+    { label: "Earlier", items: items.filter((n) => new Date(n.created_at) < startOfYesterday) },
   ].filter((g) => g.items.length > 0);
 }
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Skeleton
 // ---------------------------------------------------------------------------
 
-function formatAmount(amount: number): string {
-  return `₱${amount.toLocaleString("en-PH", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
-
-function getTitle(notification: ParentNotification): string {
-  if (notification.type === "App\\Notifications\\PaymentReminderNotification") {
-    const { school_month, school_year } = notification.data;
-    const month = school_month.charAt(0).toUpperCase() + school_month.slice(1);
-    return `Payment Reminder — ${month} ${school_year}`;
-  }
-  return notification.data.title ?? "Announcement";
-}
-
-function getPreview(notification: ParentNotification): string {
-  if (notification.type === "App\\Notifications\\PaymentReminderNotification") {
-    const { students, total_amount } = notification.data;
-    const count = students.length;
-    return `${count} student${count !== 1 ? "s" : ""} — ${formatAmount(total_amount)}`;
-  }
-  const { message } = notification.data;
-  return message.length > 120 ? message.slice(0, 120) + "…" : message;
+function NotificationSkeleton() {
+  return (
+    <div className="flex flex-col gap-3">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="rounded-xl border border-border border-l-4 border-l-muted bg-card p-4">
+          <div className="flex items-start gap-3">
+            <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+            <div className="flex-1 space-y-2">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-5 w-20 rounded-full" />
+              </div>
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-1/4" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 // ---------------------------------------------------------------------------
-// NotificationRow
+// Detail Sheet
 // ---------------------------------------------------------------------------
 
-interface NotificationRowProps {
-  notification: ParentNotification;
-  isExpanded: boolean;
-  onRowClick: (notification: ParentNotification) => void;
-  onMarkRead: (id: string) => void;
+interface DetailSheetProps {
+  notification: ParentNotification | null;
+  onClose: () => void;
   onDelete: (id: string) => void;
+  isDeleting: boolean;
 }
 
-function NotificationRow({
+function NotificationDetailSheet({
   notification,
-  isExpanded,
-  onRowClick,
-  onMarkRead,
+  onClose,
   onDelete,
-}: NotificationRowProps) {
-  const isUnread = notification.read_at === null;
+  isDeleting,
+}: DetailSheetProps) {
+  const router = useRouter();
+
+  const isPayment =
+    notification?.type === "App\\Notifications\\PaymentReminderNotification";
   const isAnnouncement =
-    notification.type === "App\\Notifications\\AnnouncementNotification";
-  const title = getTitle(notification);
-  const preview = getPreview(notification);
+    notification?.type === "App\\Notifications\\AnnouncementNotification";
 
   return (
-    <div
-      role="article"
-      aria-label={title}
-      className={cn(
-        "group relative flex cursor-pointer items-start gap-2 rounded-md px-2 py-2.5 transition-colors hover:bg-muted/30",
-        isUnread && "bg-primary/5"
-      )}
-      onClick={() => onRowClick(notification)}
-    >
-      {/* Unread dot */}
-      <span
-        aria-hidden="true"
-        className={cn(
-          "mt-1.5 h-2 w-2 shrink-0 rounded-full",
-          isUnread ? "bg-primary" : "bg-transparent"
-        )}
-      />
+    <Sheet open={notification !== null} onOpenChange={(o) => !o && onClose()}>
+      <SheetContent className="w-full sm:max-w-md overflow-y-auto">
+        {notification && (
+          <div className="px-2 pb-6 space-y-6">
+            <SheetHeader>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span
+                  className={cn(
+                    "text-[11px] font-bold px-2.5 py-0.5 rounded-full border",
+                    isPayment
+                      ? "bg-red-100 text-red-700 border-red-300"
+                      : "bg-amber-100 text-amber-700 border-amber-300"
+                  )}
+                >
+                  {isPayment ? "Payment" : "Announcement"}
+                </span>
+                {notification.read_at === null && (
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border bg-primary/10 text-primary border-primary/30">
+                    Unread
+                  </span>
+                )}
+              </div>
+              <SheetTitle className="text-left">
+                {isPayment
+                  ? "Payment Reminder"
+                  : (notification.data.title ?? "Announcement")}
+              </SheetTitle>
+              <SheetDescription className="text-left">
+                {new Date(notification.created_at).toLocaleDateString("en-PH", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </SheetDescription>
+            </SheetHeader>
 
-      <div className="min-w-0 flex-1 space-y-0.5">
-        <div className="flex items-baseline justify-between gap-2">
-          <p
-            className={cn(
-              "text-sm leading-snug",
-              isUnread ? "font-semibold text-foreground" : "text-muted-foreground"
-            )}
-          >
-            {title}
-          </p>
-          <span className="shrink-0 text-xs text-muted-foreground">
-            {relativeTime(notification.created_at)}
-          </span>
-        </div>
-        <p className="line-clamp-2 text-xs text-muted-foreground">{preview}</p>
+            {/* Content */}
+            <div className="rounded-lg border border-border bg-muted/30 p-4">
+              {isPayment ? (
+                <>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+                    Payment Details
+                  </p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Period</span>
+                      <span className="font-medium capitalize">
+                        {notification.data.school_month} {notification.data.school_year}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Due date</span>
+                      <span className="font-medium">
+                        {new Date(notification.data.due_date).toLocaleDateString("en-PH", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    {notification.data.students.length > 0 && (
+                      <div className="mt-3 space-y-1 border-t border-border pt-3">
+                        {notification.data.students.map((s, i) => (
+                          <div key={i} className="flex items-center justify-between text-sm">
+                            <span className="text-foreground">{s.name}</span>
+                            <span className="font-semibold text-foreground">
+                              ₱{s.amount.toLocaleString()}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between border-t border-border pt-2 mt-2">
+                      <span className="text-sm font-semibold">Total</span>
+                      <span className="text-base font-bold text-foreground">
+                        ₱{notification.data.total_amount.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                    Message
+                  </p>
+                  <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
+                    {notification.data.message}
+                  </p>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    From: {notification.data.sender_name}
+                  </p>
+                </>
+              )}
+            </div>
 
-        {/* Inline accordion for announcements */}
-        {isAnnouncement && isExpanded && (
-          <div
-            className="mt-2 rounded-md border border-border bg-muted/40 p-3 text-sm"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <p className="whitespace-pre-wrap text-foreground">
-              {notification.data.message}
-            </p>
-            <p className="mt-2 text-xs text-muted-foreground">
-              From: {notification.data.sender_name}
-            </p>
+            {/* Actions */}
+            <div className="flex justify-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onDelete(notification.id)}
+                disabled={isDeleting}
+                className="text-destructive border-destructive/40 hover:bg-destructive/10"
+              >
+                <Trash2 className="h-3.5 w-3.5 mr-1.5" aria-hidden="true" />
+                {isDeleting ? "Deleting…" : "Delete"}
+              </Button>
+              {isPayment && (
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    onClose();
+                    const students = notification.data.students;
+                    const firstWithId = students.find((s) => s.id != null);
+                    router.push(
+                      firstWithId
+                        ? `/students/${firstWithId.id}?tab=payment-history`
+                        : "/students"
+                    );
+                  }}
+                >
+                  <CreditCard className="h-3.5 w-3.5 mr-1.5" aria-hidden="true" />
+                  View Payments
+                </Button>
+              )}
+              {isAnnouncement && (
+                <Button variant="outline" size="sm" onClick={onClose}>
+                  <ExternalLink className="h-3.5 w-3.5 mr-1.5" aria-hidden="true" />
+                  Close
+                </Button>
+              )}
+            </div>
           </div>
         )}
-      </div>
-
-      {/* Context menu — visible on hover */}
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          aria-label="Notification options"
-          className="shrink-0 rounded-md p-1 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-muted focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-44">
-          {isUnread && (
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                onMarkRead(notification.id);
-              }}
-              className="flex items-center gap-2"
-            >
-              <Check className="h-4 w-4" aria-hidden="true" />
-              Mark as read
-            </DropdownMenuItem>
-          )}
-          <DropdownMenuItem
-            variant="destructive"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(notification.id);
-            }}
-            className="flex items-center gap-2"
-          >
-            <Trash2 className="h-4 w-4" aria-hidden="true" />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -207,83 +256,102 @@ function NotificationRow({
 // ---------------------------------------------------------------------------
 
 export default function NotificationsPage() {
-  const router = useRouter();
-  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<Tab>("all");
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
-  const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
+  const [selectedNotification, setSelectedNotification] =
+    useState<ParentNotification | null>(null);
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ["notifications"],
     queryFn: () => notificationApi.list(),
   });
 
-  const { data: unreadData } = useQuery({
+  const { data: countData } = useQuery({
     queryKey: ["unread-count"],
     queryFn: () => notificationApi.unreadCount(),
   });
 
+  const unreadCount = countData?.count ?? 0;
   const notifications = data?.data ?? [];
-  const unreadCount = unreadData?.count ?? 0;
 
-  const invalidate = () => {
+  function invalidateAll() {
     queryClient.invalidateQueries({ queryKey: ["notifications"] });
     queryClient.invalidateQueries({ queryKey: ["unread-count"] });
-  };
+  }
 
   const markReadMutation = useMutation({
     mutationFn: (id: string) => notificationApi.markRead(id),
-    onSuccess: invalidate,
-  });
-
-  const markAllReadMutation = useMutation({
-    mutationFn: () => notificationApi.markAllRead(),
-    onSuccess: invalidate,
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["notifications"] });
+      const prev = queryClient.getQueryData(["notifications"]);
+      queryClient.setQueryData(["notifications"], (old: any) => ({
+        ...old,
+        data: old?.data?.map((n: any) =>
+          n.id === id ? { ...n, read_at: new Date().toISOString() } : n
+        ),
+      }));
+      return { prev };
+    },
+    onError: (_err: unknown, _id: string, ctx: any) => {
+      if (ctx?.prev) queryClient.setQueryData(["notifications"], ctx.prev);
+    },
+    onSettled: () => invalidateAll(),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => notificationApi.destroy(id),
-    onSuccess: invalidate,
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["notifications"] });
+      const prev = queryClient.getQueryData(["notifications"]);
+      queryClient.setQueryData(["notifications"], (old: any) => ({
+        ...old,
+        data: old?.data?.filter((n: any) => n.id !== id),
+      }));
+      return { prev };
+    },
+    onError: (_err: unknown, _id: string, ctx: any) => {
+      if (ctx?.prev) queryClient.setQueryData(["notifications"], ctx.prev);
+      toast.error("Failed to delete notification.");
+    },
+    onSettled: () => {
+      invalidateAll();
+      setSelectedNotification(null);
+    },
+  });
+
+  const markAllReadMutation = useMutation({
+    mutationFn: () => notificationApi.markAllRead(),
+    onSuccess: () => {
+      invalidateAll();
+      toast.success("All notifications marked as read.");
+    },
   });
 
   const clearAllMutation = useMutation({
     mutationFn: () => notificationApi.clearAll(),
     onSuccess: () => {
+      invalidateAll();
       setClearDialogOpen(false);
-      invalidate();
       toast.success("All notifications cleared.");
     },
   });
 
-  function handleRowClick(notification: ParentNotification) {
-    const id = notification.id;
-    const isUnread = notification.read_at === null;
-
-    if (notification.type === "App\\Notifications\\PaymentReminderNotification") {
-      if (isUnread) markReadMutation.mutate(id);
-      router.push("/payments");
-      return;
+  function handleOpen(notification: ParentNotification) {
+    setSelectedNotification(notification);
+    if (notification.read_at === null) {
+      markReadMutation.mutate(notification.id);
     }
-
-    // Announcement: mark read + toggle accordion
-    if (isUnread) markReadMutation.mutate(id);
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
   }
 
   if (isLoading) {
     return (
-      <div className="space-y-3" aria-busy="true" aria-label="Loading notifications">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-14 animate-pulse rounded-md bg-muted" />
-        ))}
+      <div className="p-6 space-y-4">
+        <div>
+          <p className="text-xs text-muted-foreground">Activity</p>
+          <h1 className="text-xl font-bold text-foreground">Notifications</h1>
+        </div>
+        <NotificationSkeleton />
       </div>
     );
   }
@@ -296,10 +364,13 @@ export default function NotificationsPage() {
   const groups = groupByDate(displayed);
 
   return (
-    <div className="space-y-4">
+    <div className="p-6 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Notifications</h1>
+        <div>
+          <p className="text-xs text-muted-foreground">Activity</p>
+          <h1 className="text-xl font-bold text-foreground">Notifications</h1>
+        </div>
         <div className="flex items-center gap-2">
           {unreadCount > 0 && (
             <Button
@@ -309,18 +380,45 @@ export default function NotificationsPage() {
               disabled={markAllReadMutation.isPending}
               aria-label="Mark all notifications as read"
             >
-              <CheckCheck className="mr-1.5 h-4 w-4" aria-hidden="true" />
-              Mark all read
+              <CheckCheck className="h-4 w-4" aria-hidden="true" />
+              <span>Mark all read</span>
             </Button>
           )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setClearDialogOpen(true)}
-            aria-label="Clear all notifications"
-          >
-            Clear all
-          </Button>
+          {notifications.length > 0 && (
+            <AlertDialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
+              <AlertDialogTrigger
+                render={
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    aria-label="Clear all notifications"
+                  />
+                }
+              >
+                <Trash2 className="h-4 w-4" aria-hidden="true" />
+                <span>Clear all</span>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Clear all notifications?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete all your notifications. This action cannot be
+                    undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => clearAllMutation.mutate()}
+                    disabled={clearAllMutation.isPending}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {clearAllMutation.isPending ? "Clearing…" : "Clear all"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
       </div>
 
@@ -362,54 +460,51 @@ export default function NotificationsPage() {
       {/* Empty state */}
       {displayed.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <Bell className="mb-3 h-8 w-8 text-muted-foreground" aria-hidden="true" />
-          <p className="font-medium">You&apos;re all caught up</p>
-          <p className="mt-1 text-sm text-muted-foreground">No new notifications right now.</p>
+          <Bell className="mb-3 h-10 w-10 text-muted-foreground" aria-hidden="true" />
+          <p className="text-sm font-medium text-muted-foreground">You&apos;re all caught up</p>
         </div>
       )}
 
       {/* Grouped list */}
       {groups.map((group) => (
-        <div key={group.label}>
-          <p className="mb-1 px-2 text-xs font-bold uppercase tracking-wider text-muted-foreground/60">
-            {group.label}
-          </p>
-          <div>
+        <div key={group.label} className="space-y-3">
+          <div className="flex items-center gap-2">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground/60">
+              {group.label}
+            </p>
+            <Separator className="flex-1" />
+          </div>
+          <div className="flex flex-col gap-3">
             {group.items.map((n) => (
-              <NotificationRow
+              <NotificationItem
                 key={n.id}
                 notification={n}
-                isExpanded={expandedIds.has(n.id)}
-                onRowClick={handleRowClick}
+                variant="card"
+                onCardClick={() => handleOpen(n)}
                 onMarkRead={(id) => markReadMutation.mutate(id)}
                 onDelete={(id) => deleteMutation.mutate(id)}
+                isMarkingRead={
+                  markReadMutation.isPending && markReadMutation.variables === n.id
+                }
+                isDeleting={
+                  deleteMutation.isPending && deleteMutation.variables === n.id
+                }
               />
             ))}
           </div>
         </div>
       ))}
 
-      {/* Clear all confirmation dialog */}
-      <AlertDialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Clear all notifications?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete all your notifications. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => clearAllMutation.mutate()}
-              disabled={clearAllMutation.isPending}
-              variant="destructive"
-            >
-              Clear all
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Detail sheet */}
+      <NotificationDetailSheet
+        notification={selectedNotification}
+        onClose={() => setSelectedNotification(null)}
+        onDelete={(id) => deleteMutation.mutate(id)}
+        isDeleting={
+          deleteMutation.isPending &&
+          deleteMutation.variables === selectedNotification?.id
+        }
+      />
     </div>
   );
 }

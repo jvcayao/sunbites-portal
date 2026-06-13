@@ -28,7 +28,6 @@ const navLinks: NavLink[] = [
   { label: "Students", href: "/students" },
   { label: "Meal Plan", href: "/meal-plan" },
   { label: "Feedback", href: "/feedback" },
-  { label: "Notifications", href: "/notifications" },
 ];
 
 interface PortalLayoutProps {

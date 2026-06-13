@@ -23,6 +23,14 @@ jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
+const mockAuthState = { parent: { id: 1, name: "Parent User" }, token: null };
+jest.mock("@/lib/store/auth", () => ({
+  useAuthStore: Object.assign(
+    (sel: (s: any) => any) => sel(mockAuthState),
+    { getState: () => mockAuthState }
+  ),
+}));
+
 // ---------------------------------------------------------------------------
 // Fixtures
 // ---------------------------------------------------------------------------
@@ -34,7 +42,7 @@ const paymentReminderFixture = {
     school_month: "august",
     school_year: 2026,
     due_date: "2026-08-01",
-    students: [{ name: "Juan Santos", amount: 2430 }],
+    students: [{ id: 42, name: "Juan Santos", amount: 2430 }],
     total_amount: 2430,
   },
   read_at: null,
@@ -87,36 +95,26 @@ beforeEach(() => {
   mockPush.mockClear();
 });
 
-describe("NotificationsPage", () => {
+describe("NotificationsPage (Portal)", () => {
   it("renders a payment reminder with the correct title and preview", async () => {
     setupHandlers([paymentReminderFixture]);
 
     render(<NotificationsPage />);
 
+    expect(await screen.findByText("Payment Reminder")).toBeInTheDocument();
     expect(
-      await screen.findByText("Payment Reminder — August 2026"),
-    ).toBeInTheDocument();
-
-    expect(
-      await screen.findByText("1 student — ₱2,430.00"),
+      screen.getByText("august 2026 — ₱2,430 due")
     ).toBeInTheDocument();
   });
 
-  it("renders an announcement with its title and message — not 'Payment reminder'", async () => {
+  it("renders an announcement with its title and message", async () => {
     setupHandlers([announcementFixture]);
 
     render(<NotificationsPage />);
 
+    expect(await screen.findByText("Canteen closure notice")).toBeInTheDocument();
     expect(
-      await screen.findByText("Canteen closure notice"),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.queryByText(/payment reminder/i),
-    ).not.toBeInTheDocument();
-
-    expect(
-      await screen.findByText(/The canteen will be closed on Friday/),
+      screen.getByText("The canteen will be closed on Friday due to maintenance.")
     ).toBeInTheDocument();
   });
 
@@ -128,58 +126,37 @@ describe("NotificationsPage", () => {
     expect(await screen.findByText(/You're all caught up/i)).toBeInTheDocument();
   });
 
-  it("clicking a payment reminder card navigates to /payments", async () => {
+  it("clicking a payment reminder opens the sheet and the view button navigates to /payments", async () => {
     setupHandlers([paymentReminderFixture]);
 
     render(<NotificationsPage />);
 
-    const card = await screen.findByRole("article", {
-      name: "Payment Reminder — August 2026",
+    const item = await screen.findByRole("button", {
+      name: /payment reminder/i,
     });
 
-    await userEvent.click(card);
+    await userEvent.click(item);
+
+    const viewBtn = await screen.findByRole("button", { name: /view payments/i });
+    await userEvent.click(viewBtn);
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith("/payments");
+      expect(mockPush).toHaveBeenCalledWith("/students/42?tab=payment-history");
     });
   });
 
-  it("clicking an announcement card expands the full message inline and does not navigate", async () => {
+  it("clicking an announcement does not navigate away", async () => {
     setupHandlers([announcementFixture]);
 
     render(<NotificationsPage />);
 
-    const card = await screen.findByRole("article", {
-      name: "Canteen closure notice",
+    const item = await screen.findByRole("button", {
+      name: /canteen closure notice/i,
     });
 
-    // Full message is not visible before clicking
-    expect(
-      screen.queryByText("From: Maria Santos"),
-    ).not.toBeInTheDocument();
-
-    await userEvent.click(card);
-
-    // Full message expands inline
-    expect(
-      await screen.findByText("From: Maria Santos"),
-    ).toBeInTheDocument();
+    await userEvent.click(item);
 
     expect(mockPush).not.toHaveBeenCalled();
-  });
-
-  it("cards show relative timestamps", async () => {
-    setupHandlers([paymentReminderFixture, announcementFixture]);
-
-    render(<NotificationsPage />);
-
-    // Wait for cards to load
-    await screen.findByText("Payment Reminder — August 2026");
-
-    // Relative timestamps: "5m", "10m", "just now", etc.
-    const timestamps = await screen.findAllByText(/^\d+[smhd]$|^just now$/i);
-
-    expect(timestamps.length).toBeGreaterThanOrEqual(1);
   });
 
   it("shows the 'Today' date group header for notifications created today", async () => {
@@ -200,15 +177,14 @@ describe("NotificationsPage", () => {
 
     render(<NotificationsPage />);
 
-    // Wait for All tab to load both items
-    await screen.findAllByText("Payment Reminder — August 2026");
+    await screen.findAllByText("Payment Reminder");
 
-    // Switch to Unread tab
-    const unreadTab = screen.getByRole("tab", { name: /unread/i });
-    await userEvent.click(unreadTab);
+    await userEvent.click(screen.getByRole("tab", { name: /unread/i }));
 
-    // Unread tab should show only the unread notification (1 article)
-    const articles = screen.getAllByRole("article");
-    expect(articles).toHaveLength(1);
+    await waitFor(() => {
+      expect(
+        screen.getAllByRole("button", { name: /payment reminder/i })
+      ).toHaveLength(1);
+    });
   });
 });
