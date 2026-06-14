@@ -31,7 +31,10 @@ import { NotificationItem } from "@/components/notification-item";
 import { notificationApi } from "@/lib/api/notifications";
 import { cn } from "@/lib/utils";
 
-import type { ParentNotification } from "@/types/notification";
+import type {
+  NotificationListResponse,
+  ParentNotification,
+} from "@/types/notification";
 
 type Tab = "all" | "unread";
 
@@ -284,16 +287,16 @@ export default function NotificationsPage() {
     mutationFn: (id: string) => notificationApi.markRead(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ["notifications"] });
-      const prev = queryClient.getQueryData(["notifications"]);
-      queryClient.setQueryData(["notifications"], (old: any) => ({
+      const prev = queryClient.getQueryData(["notifications"]) as NotificationListResponse | undefined;
+      queryClient.setQueryData(["notifications"], (old: NotificationListResponse | undefined) => ({
         ...old,
-        data: old?.data?.map((n: any) =>
+        data: old?.data?.map((n: ParentNotification) =>
           n.id === id ? { ...n, read_at: new Date().toISOString() } : n
         ),
       }));
       return { prev };
     },
-    onError: (_err: unknown, _id: string, ctx: any) => {
+    onError: (_err: unknown, _id: string, ctx: { prev: NotificationListResponse | undefined } | undefined) => {
       if (ctx?.prev) queryClient.setQueryData(["notifications"], ctx.prev);
     },
     onSettled: () => invalidateAll(),
@@ -303,14 +306,14 @@ export default function NotificationsPage() {
     mutationFn: (id: string) => notificationApi.destroy(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ["notifications"] });
-      const prev = queryClient.getQueryData(["notifications"]);
-      queryClient.setQueryData(["notifications"], (old: any) => ({
+      const prev = queryClient.getQueryData(["notifications"]) as NotificationListResponse | undefined;
+      queryClient.setQueryData(["notifications"], (old: NotificationListResponse | undefined) => ({
         ...old,
-        data: old?.data?.filter((n: any) => n.id !== id),
+        data: old?.data?.filter((n: ParentNotification) => n.id !== id),
       }));
       return { prev };
     },
-    onError: (_err: unknown, _id: string, ctx: any) => {
+    onError: (_err: unknown, _id: string, ctx: { prev: NotificationListResponse | undefined } | undefined) => {
       if (ctx?.prev) queryClient.setQueryData(["notifications"], ctx.prev);
       toast.error("Failed to delete notification.");
     },

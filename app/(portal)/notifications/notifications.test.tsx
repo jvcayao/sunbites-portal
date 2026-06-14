@@ -26,7 +26,7 @@ jest.mock("next/navigation", () => ({
 const mockAuthState = { parent: { id: 1, name: "Parent User" }, token: null };
 jest.mock("@/lib/store/auth", () => ({
   useAuthStore: Object.assign(
-    (sel: (s: any) => any) => sel(mockAuthState),
+    (sel: (s: typeof mockAuthState) => unknown) => sel(mockAuthState),
     { getState: () => mockAuthState }
   ),
 }));

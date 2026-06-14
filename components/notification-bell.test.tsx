@@ -4,6 +4,7 @@ import { http, HttpResponse } from "msw";
 
 import { server } from "@/__tests__/mocks/server";
 import { NotificationBell } from "./notification-bell";
+import type { ParentNotification } from "@/types/notification";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -14,7 +15,7 @@ jest.mock("@/components/providers/echo-provider", () => ({
 const mockAuthState = { parent: { id: 1, name: "Parent" }, token: null };
 jest.mock("@/lib/store/auth", () => ({
   useAuthStore: Object.assign(
-    (sel: (s: any) => any) => sel(mockAuthState),
+    (sel: (s: typeof mockAuthState) => unknown) => sel(mockAuthState),
     { getState: () => mockAuthState }
   ),
 }));
@@ -23,7 +24,7 @@ jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: jest.fn() }),
 }));
 
-function setupHandlers(count = 0, items: any[] = []) {
+function setupHandlers(count = 0, items: ParentNotification[] = []) {
   server.use(
     http.get(`${API}/portal/notifications/unread-count`, () =>
       HttpResponse.json({ count })

@@ -48,7 +48,6 @@ export function EchoProvider({ children }: EchoProviderProps) {
 
     return () => {
       instance.disconnect();
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEcho(null);
     };
   }, [token]);
