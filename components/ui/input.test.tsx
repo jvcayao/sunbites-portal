@@ -37,4 +37,9 @@ describe("Input", () => {
     expect(screen.getByPlaceholderText("Password")).toHaveAttribute("type", "password")
     expect(screen.getByRole("button", { name: "Show password" })).toBeInTheDocument()
   })
+
+  it("disables the toggle button when the input is disabled", () => {
+    render(<Input type="password" placeholder="Password" disabled />)
+    expect(screen.getByRole("button", { name: "Show password" })).toBeDisabled()
+  })
 })
