@@ -167,7 +167,7 @@ function NotificationDetailSheet({
                             key={i}
                             className="flex items-center justify-between text-sm"
                           >
-                            <span className="text-foreground">{s.name}</span>
+                            <span className="text-foreground">{s.full_name}</span>
                             <span className="font-semibold text-foreground">
                               ₱{s.amount.toLocaleString()}
                             </span>

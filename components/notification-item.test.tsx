@@ -29,7 +29,7 @@ const paymentReminderUnread = {
     school_month: "June",
     school_year: 2026,
     due_date: "2026-06-30",
-    students: [{ name: "Juan dela Cruz", amount: 1500 }],
+    students: [{ full_name: "Juan dela Cruz", amount: 1500 }],
     total_amount: 1500,
   },
   read_at: null,
