@@ -16,10 +16,11 @@ export const handlers = [
         profile_photo_url: null,
         created_at: "2026-01-01T00:00:00.000000Z",
       },
-    })
+    }),
   ),
 
-  http.post(`${API}/portal/auth/logout`, () =>
-    new HttpResponse(null, { status: 204 })
+  http.post(
+    `${API}/portal/auth/logout`,
+    () => new HttpResponse(null, { status: 204 }),
   ),
 ];

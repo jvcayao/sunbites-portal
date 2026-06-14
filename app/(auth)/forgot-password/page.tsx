@@ -46,7 +46,9 @@ export default function ForgotPasswordPage() {
   return (
     <AuthLayout>
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-foreground">Reset your password</h2>
+        <h2 className="text-xl font-bold text-foreground">
+          Reset your password
+        </h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Enter your email and we&apos;ll send you a reset link.
         </p>
@@ -80,13 +82,21 @@ export default function ForgotPasswordPage() {
               className={cn(fieldErrors.email && "border-destructive")}
             />
             {fieldErrors.email && (
-              <p id="email-error" role="alert" className="text-xs text-destructive">
+              <p
+                id="email-error"
+                role="alert"
+                className="text-xs text-destructive"
+              >
                 {fieldErrors.email[0]}
               </p>
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={mutation.isPending}>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={mutation.isPending}
+          >
             {mutation.isPending ? "Sending…" : "Send Reset Link"}
           </Button>
 

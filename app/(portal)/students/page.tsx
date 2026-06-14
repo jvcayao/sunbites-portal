@@ -5,12 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronRight } from "lucide-react";
 
 import { EnrollmentStatusBadge } from "@/components/enrollment-status-badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { studentsApi } from "@/lib/api/portal";
 import { formatPHP } from "@/lib/format";
@@ -51,7 +46,10 @@ function StudentRow({ student }: { student: StudentDetail }) {
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <EnrollmentStatusBadge status={student.enrollment_status} />
-              <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              <ChevronRight
+                className="h-4 w-4 text-muted-foreground"
+                aria-hidden="true"
+              />
             </div>
           </div>
         </CardHeader>
@@ -94,7 +92,9 @@ export default function StudentsPage() {
         </p>
       ) : !data?.data.length ? (
         <div className="rounded-xl border border-dashed border-border p-10 text-center">
-          <p className="text-muted-foreground">No students linked to your account.</p>
+          <p className="text-muted-foreground">
+            No students linked to your account.
+          </p>
         </div>
       ) : (
         <div className="space-y-4">

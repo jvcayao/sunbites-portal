@@ -56,7 +56,7 @@ function PillButton({
         active
           ? "border-primary bg-primary text-primary-foreground"
           : "border-border bg-background text-foreground hover:border-primary/50",
-        className
+        className,
       )}
     >
       {children}
@@ -123,10 +123,7 @@ function MealGrid({ days }: { days: MealPlanDay[] }) {
                 {day.day_label}
               </td>
               {COLUMNS.map((col) => (
-                <td
-                  key={col.key}
-                  className={cn("px-3 py-2 text-sm", col.bg)}
-                >
+                <td key={col.key} className={cn("px-3 py-2 text-sm", col.bg)}>
                   {day[col.key] || "—"}
                 </td>
               ))}

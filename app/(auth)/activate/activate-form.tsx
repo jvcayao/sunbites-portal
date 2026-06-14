@@ -52,7 +52,9 @@ export function ActivateForm() {
       if (error.errors?.token) {
         setTokenError("This activation link is invalid or has expired.");
       } else {
-        setTokenError(error.message ?? "Something went wrong. Please try again.");
+        setTokenError(
+          error.message ?? "Something went wrong. Please try again.",
+        );
       }
     },
   });
@@ -117,7 +119,10 @@ export function ActivateForm() {
       </div>
 
       {tokenError && (
-        <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive" role="alert">
+        <div
+          className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
+          role="alert"
+        >
           {tokenError}
         </div>
       )}
@@ -131,13 +136,21 @@ export function ActivateForm() {
             autoComplete="new-password"
             placeholder="Minimum 8 characters"
             value={values.password ?? ""}
-            onChange={(e) => setValues((v) => ({ ...v, password: e.target.value }))}
+            onChange={(e) =>
+              setValues((v) => ({ ...v, password: e.target.value }))
+            }
             aria-invalid={!!fieldErrors.password}
-            aria-describedby={fieldErrors.password ? "password-error" : undefined}
+            aria-describedby={
+              fieldErrors.password ? "password-error" : undefined
+            }
             className={cn(fieldErrors.password && "border-destructive")}
           />
           {fieldErrors.password && (
-            <p id="password-error" role="alert" className="text-xs text-destructive">
+            <p
+              id="password-error"
+              role="alert"
+              className="text-xs text-destructive"
+            >
               {fieldErrors.password[0]}
             </p>
           )}
@@ -152,16 +165,25 @@ export function ActivateForm() {
             placeholder="Re-enter your password"
             value={values.password_confirmation ?? ""}
             onChange={(e) =>
-              setValues((v) => ({ ...v, password_confirmation: e.target.value }))
+              setValues((v) => ({
+                ...v,
+                password_confirmation: e.target.value,
+              }))
             }
             aria-invalid={!!fieldErrors.password_confirmation}
             aria-describedby={
               fieldErrors.password_confirmation ? "confirm-error" : undefined
             }
-            className={cn(fieldErrors.password_confirmation && "border-destructive")}
+            className={cn(
+              fieldErrors.password_confirmation && "border-destructive",
+            )}
           />
           {fieldErrors.password_confirmation && (
-            <p id="confirm-error" role="alert" className="text-xs text-destructive">
+            <p
+              id="confirm-error"
+              role="alert"
+              className="text-xs text-destructive"
+            >
               {fieldErrors.password_confirmation[0]}
             </p>
           )}

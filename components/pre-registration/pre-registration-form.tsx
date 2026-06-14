@@ -9,7 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { preRegistrationApi } from "@/lib/api/pre-registration";
-import { preRegistrationSchema, type PreRegistrationFormData } from "@/lib/validation/pre-registration";
+import {
+  preRegistrationSchema,
+  type PreRegistrationFormData,
+} from "@/lib/validation/pre-registration";
 import { cn } from "@/lib/utils";
 
 import type { Branch } from "@/types/pre-registration";
@@ -46,7 +49,14 @@ const SCHOOL_MONTHS = [
   { value: "march", label: "March" },
 ];
 
-const RELATIONSHIPS = ["Mother", "Father", "Guardian", "Grandparent", "Sibling", "Other"];
+const RELATIONSHIPS = [
+  "Mother",
+  "Father",
+  "Guardian",
+  "Grandparent",
+  "Sibling",
+  "Other",
+];
 
 const CURRENT_YEAR = new Date().getFullYear();
 const SCHOOL_YEARS = [CURRENT_YEAR, CURRENT_YEAR + 1, CURRENT_YEAR + 2];
@@ -113,7 +123,13 @@ const INITIAL_VALUES: FormValues = {
 // Sub-components
 // ---------------------------------------------------------------------------
 
-function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="rounded-xl border border-border bg-card p-5 space-y-4">
       <h2 className="text-xs font-extrabold uppercase tracking-wider text-primary border-b border-border pb-2">
@@ -127,7 +143,10 @@ function SectionCard({ title, children }: { title: string; children: React.React
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
   return (
-    <p role="alert" className="mt-1 flex items-center gap-1 text-xs text-destructive">
+    <p
+      role="alert"
+      className="mt-1 flex items-center gap-1 text-xs text-destructive"
+    >
       <AlertCircle className="h-3.5 w-3.5 shrink-0" />
       {message}
     </p>
@@ -188,7 +207,11 @@ export function PreRegistrationForm() {
       .finally(() => setBranchesLoading(false));
   }, []);
 
-  function setContact(index: number, field: keyof ContactField, value: string | boolean) {
+  function setContact(
+    index: number,
+    field: keyof ContactField,
+    value: string | boolean,
+  ) {
     setValues((v) => {
       const contacts = [...v.contacts];
       contacts[index] = { ...contacts[index], [field]: value };
@@ -245,16 +268,22 @@ export function PreRegistrationForm() {
       };
 
       if (values.enrollment_type === "subscription") {
-        schemaData.subscription_start_month = values.subscription_start_month as typeof schemaData.subscription_start_month;
-        schemaData.subscription_start_year = values.subscription_start_year ?? undefined;
-        schemaData.subscription_end_month = values.subscription_end_month as typeof schemaData.subscription_end_month;
-        schemaData.subscription_end_year = values.subscription_end_year ?? undefined;
+        schemaData.subscription_start_month =
+          values.subscription_start_month as typeof schemaData.subscription_start_month;
+        schemaData.subscription_start_year =
+          values.subscription_start_year ?? undefined;
+        schemaData.subscription_end_month =
+          values.subscription_end_month as typeof schemaData.subscription_end_month;
+        schemaData.subscription_end_year =
+          values.subscription_end_year ?? undefined;
       }
 
       const result = preRegistrationSchema.safeParse(schemaData);
       if (!result.success) {
         const flat = result.error.flatten();
-        const errors: Record<string, string[]> = { ...flat.fieldErrors } as Record<string, string[]>;
+        const errors: Record<string, string[]> = {
+          ...flat.fieldErrors,
+        } as Record<string, string[]>;
         result.error.issues.forEach((issue) => {
           const path = issue.path.join(".");
           if (path && !errors[path]) {
@@ -266,7 +295,9 @@ export function PreRegistrationForm() {
       }
 
       if (!values.permissions_checked) {
-        setFieldErrors({ permissions_checked: ["You must accept the terms before submitting."] });
+        setFieldErrors({
+          permissions_checked: ["You must accept the terms before submitting."],
+        });
         return;
       }
 
@@ -287,7 +318,9 @@ export function PreRegistrationForm() {
         setSubmitted(true);
       } catch (err) {
         const apiError = err as ApiError;
-        setServerError(apiError.message ?? "Something went wrong. Please try again.");
+        setServerError(
+          apiError.message ?? "Something went wrong. Please try again.",
+        );
       } finally {
         setSubmitting(false);
       }
@@ -307,10 +340,13 @@ export function PreRegistrationForm() {
           size={48}
           aria-hidden="true"
         />
-        <h2 className="text-xl font-bold text-green-800">Pre-Registration Received!</h2>
+        <h2 className="text-xl font-bold text-green-800">
+          Pre-Registration Received!
+        </h2>
         <p className="text-green-700 text-sm">
-          We&apos;ve received your pre-registration. Our canteen staff will review it and reach out to you soon. Check
-          your email for a confirmation message.
+          We&apos;ve received your pre-registration. Our canteen staff will
+          review it and reach out to you soon. Check your email for a
+          confirmation message.
         </p>
         <Button
           variant="outline"
@@ -333,7 +369,10 @@ export function PreRegistrationForm() {
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-6">
       {/* Honeypot — must stay visually hidden, NOT display:none */}
-      <div style={{ position: "absolute", top: "-9999px", left: "-9999px" }} aria-hidden="true">
+      <div
+        style={{ position: "absolute", top: "-9999px", left: "-9999px" }}
+        aria-hidden="true"
+      >
         <label htmlFor="website">Website</label>
         <input
           id="website"
@@ -370,7 +409,9 @@ export function PreRegistrationForm() {
               <button
                 key={branch.id}
                 type="button"
-                onClick={() => setValues((v) => ({ ...v, branch_id: branch.id }))}
+                onClick={() =>
+                  setValues((v) => ({ ...v, branch_id: branch.id }))
+                }
                 className={cn(
                   "rounded-lg border p-3 text-left text-sm transition-colors",
                   values.branch_id === branch.id
@@ -404,7 +445,9 @@ export function PreRegistrationForm() {
             <button
               key={opt.value}
               type="button"
-              onClick={() => setValues((v) => ({ ...v, enrollment_type: opt.value }))}
+              onClick={() =>
+                setValues((v) => ({ ...v, enrollment_type: opt.value }))
+              }
               className={cn(
                 "rounded-lg border p-4 text-left transition-colors",
                 values.enrollment_type === opt.value
@@ -415,7 +458,9 @@ export function PreRegistrationForm() {
               <p
                 className={cn(
                   "text-sm font-semibold",
-                  values.enrollment_type === opt.value ? "text-primary" : "text-foreground",
+                  values.enrollment_type === opt.value
+                    ? "text-primary"
+                    : "text-foreground",
                 )}
               >
                 {opt.label}
@@ -430,21 +475,35 @@ export function PreRegistrationForm() {
       {/* Section 3: Student Information */}
       <SectionCard title="Student Information">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField label="First Name" htmlFor="first_name" required error={fieldErrors.first_name?.[0]}>
+          <FormField
+            label="First Name"
+            htmlFor="first_name"
+            required
+            error={fieldErrors.first_name?.[0]}
+          >
             <Input
               id="first_name"
               value={values.first_name}
-              onChange={(e) => setValues((v) => ({ ...v, first_name: e.target.value }))}
+              onChange={(e) =>
+                setValues((v) => ({ ...v, first_name: e.target.value }))
+              }
               aria-invalid={!!fieldErrors.first_name}
               className={cn(fieldErrors.first_name && "border-destructive")}
             />
           </FormField>
 
-          <FormField label="Last Name" htmlFor="last_name" required error={fieldErrors.last_name?.[0]}>
+          <FormField
+            label="Last Name"
+            htmlFor="last_name"
+            required
+            error={fieldErrors.last_name?.[0]}
+          >
             <Input
               id="last_name"
               value={values.last_name}
-              onChange={(e) => setValues((v) => ({ ...v, last_name: e.target.value }))}
+              onChange={(e) =>
+                setValues((v) => ({ ...v, last_name: e.target.value }))
+              }
               aria-invalid={!!fieldErrors.last_name}
               className={cn(fieldErrors.last_name && "border-destructive")}
             />
@@ -452,12 +511,22 @@ export function PreRegistrationForm() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField label="Grade Level" htmlFor="grade_level" required error={fieldErrors.grade_level?.[0]}>
+          <FormField
+            label="Grade Level"
+            htmlFor="grade_level"
+            required
+            error={fieldErrors.grade_level?.[0]}
+          >
             <select
               id="grade_level"
               value={values.grade_level}
-              onChange={(e) => setValues((v) => ({ ...v, grade_level: e.target.value }))}
-              className={cn(SELECT_CLASSES, fieldErrors.grade_level && "border-destructive")}
+              onChange={(e) =>
+                setValues((v) => ({ ...v, grade_level: e.target.value }))
+              }
+              className={cn(
+                SELECT_CLASSES,
+                fieldErrors.grade_level && "border-destructive",
+              )}
             >
               <option value="">Select grade…</option>
               {GRADE_LEVELS.map((g) => (
@@ -468,44 +537,69 @@ export function PreRegistrationForm() {
             </select>
           </FormField>
 
-          <FormField label="Section (optional)" htmlFor="section" error={undefined}>
+          <FormField
+            label="Section (optional)"
+            htmlFor="section"
+            error={undefined}
+          >
             <Input
               id="section"
               value={values.section}
-              onChange={(e) => setValues((v) => ({ ...v, section: e.target.value }))}
+              onChange={(e) =>
+                setValues((v) => ({ ...v, section: e.target.value }))
+              }
               placeholder="e.g. Sampaguita"
             />
           </FormField>
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField label="Birthday" htmlFor="birthday" required error={fieldErrors.birthday?.[0]}>
+          <FormField
+            label="Birthday"
+            htmlFor="birthday"
+            required
+            error={fieldErrors.birthday?.[0]}
+          >
             <Input
               id="birthday"
               type="date"
               value={values.birthday}
               max={new Date().toISOString().split("T")[0]}
-              onChange={(e) => setValues((v) => ({ ...v, birthday: e.target.value }))}
+              onChange={(e) =>
+                setValues((v) => ({ ...v, birthday: e.target.value }))
+              }
               aria-invalid={!!fieldErrors.birthday}
               className={cn(fieldErrors.birthday && "border-destructive")}
             />
           </FormField>
 
-          <FormField label="Student No. (optional)" htmlFor="student_number" error={undefined}>
+          <FormField
+            label="Student No. (optional)"
+            htmlFor="student_number"
+            error={undefined}
+          >
             <Input
               id="student_number"
               value={values.student_number}
-              onChange={(e) => setValues((v) => ({ ...v, student_number: e.target.value }))}
+              onChange={(e) =>
+                setValues((v) => ({ ...v, student_number: e.target.value }))
+              }
               placeholder="e.g. SB-2024-001"
             />
           </FormField>
         </div>
 
-        <FormField label="Allergies / Dietary Restrictions (optional)" htmlFor="allergies" error={undefined}>
+        <FormField
+          label="Allergies / Dietary Restrictions (optional)"
+          htmlFor="allergies"
+          error={undefined}
+        >
           <textarea
             id="allergies"
             value={values.allergies}
-            onChange={(e) => setValues((v) => ({ ...v, allergies: e.target.value }))}
+            onChange={(e) =>
+              setValues((v) => ({ ...v, allergies: e.target.value }))
+            }
             rows={2}
             placeholder="List any known allergies or dietary restrictions"
             className={TEXTAREA_CLASSES}
@@ -516,7 +610,9 @@ export function PreRegistrationForm() {
           <textarea
             id="notes"
             value={values.notes}
-            onChange={(e) => setValues((v) => ({ ...v, notes: e.target.value }))}
+            onChange={(e) =>
+              setValues((v) => ({ ...v, notes: e.target.value }))
+            }
             rows={2}
             placeholder="Any additional information for the canteen staff"
             className={TEXTAREA_CLASSES}
@@ -528,7 +624,8 @@ export function PreRegistrationForm() {
       {values.enrollment_type === "subscription" && (
         <SectionCard title="Subscription Period">
           <p className="text-xs text-muted-foreground">
-            Select the range of school months to create payment records for this student.
+            Select the range of school months to create payment records for this
+            student.
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
@@ -540,7 +637,12 @@ export function PreRegistrationForm() {
               <select
                 id="sub_start_month"
                 value={values.subscription_start_month}
-                onChange={(e) => setValues((v) => ({ ...v, subscription_start_month: e.target.value }))}
+                onChange={(e) =>
+                  setValues((v) => ({
+                    ...v,
+                    subscription_start_month: e.target.value,
+                  }))
+                }
                 className={cn(
                   SELECT_CLASSES,
                   fieldErrors.subscription_start_month && "border-destructive",
@@ -567,7 +669,9 @@ export function PreRegistrationForm() {
                 onChange={(e) =>
                   setValues((v) => ({
                     ...v,
-                    subscription_start_year: e.target.value ? Number(e.target.value) : null,
+                    subscription_start_year: e.target.value
+                      ? Number(e.target.value)
+                      : null,
                   }))
                 }
                 className={cn(
@@ -593,7 +697,12 @@ export function PreRegistrationForm() {
               <select
                 id="sub_end_month"
                 value={values.subscription_end_month}
-                onChange={(e) => setValues((v) => ({ ...v, subscription_end_month: e.target.value }))}
+                onChange={(e) =>
+                  setValues((v) => ({
+                    ...v,
+                    subscription_end_month: e.target.value,
+                  }))
+                }
                 className={cn(
                   SELECT_CLASSES,
                   fieldErrors.subscription_end_month && "border-destructive",
@@ -620,7 +729,9 @@ export function PreRegistrationForm() {
                 onChange={(e) =>
                   setValues((v) => ({
                     ...v,
-                    subscription_end_year: e.target.value ? Number(e.target.value) : null,
+                    subscription_end_year: e.target.value
+                      ? Number(e.target.value)
+                      : null,
                   }))
                 }
                 className={cn(
@@ -643,9 +754,16 @@ export function PreRegistrationForm() {
       {/* Section 5: Parent/Guardian Contacts */}
       <SectionCard title="Parent / Guardian Contacts">
         <div className="flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">At least one contact required (up to 3).</p>
+          <p className="text-xs text-muted-foreground">
+            At least one contact required (up to 3).
+          </p>
           {values.contacts.length < 3 && (
-            <Button type="button" variant="outline" size="sm" onClick={addContact}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addContact}
+            >
               + Add Contact
             </Button>
           )}
@@ -654,7 +772,10 @@ export function PreRegistrationForm() {
 
         <div className="space-y-4">
           {values.contacts.map((contact, idx) => (
-            <div key={idx} className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+            <div
+              key={idx}
+              className="rounded-lg border border-border bg-muted/30 p-4 space-y-3"
+            >
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Contact {idx + 1}
@@ -681,9 +802,14 @@ export function PreRegistrationForm() {
                   <Input
                     id={`contact_${idx}_full_name`}
                     value={contact.full_name}
-                    onChange={(e) => setContact(idx, "full_name", e.target.value)}
+                    onChange={(e) =>
+                      setContact(idx, "full_name", e.target.value)
+                    }
                     aria-invalid={!!fieldErrors[`contacts.${idx}.full_name`]}
-                    className={cn(fieldErrors[`contacts.${idx}.full_name`] && "border-destructive")}
+                    className={cn(
+                      fieldErrors[`contacts.${idx}.full_name`] &&
+                        "border-destructive",
+                    )}
                   />
                 </FormField>
 
@@ -696,10 +822,13 @@ export function PreRegistrationForm() {
                   <select
                     id={`contact_${idx}_relationship`}
                     value={contact.relationship}
-                    onChange={(e) => setContact(idx, "relationship", e.target.value)}
+                    onChange={(e) =>
+                      setContact(idx, "relationship", e.target.value)
+                    }
                     className={cn(
                       SELECT_CLASSES,
-                      fieldErrors[`contacts.${idx}.relationship`] && "border-destructive",
+                      fieldErrors[`contacts.${idx}.relationship`] &&
+                        "border-destructive",
                     )}
                   >
                     <option value="">Select relationship…</option>
@@ -726,11 +855,18 @@ export function PreRegistrationForm() {
                     onChange={(e) => setContact(idx, "phone", e.target.value)}
                     placeholder="09171234567"
                     aria-invalid={!!fieldErrors[`contacts.${idx}.phone`]}
-                    className={cn(fieldErrors[`contacts.${idx}.phone`] && "border-destructive")}
+                    className={cn(
+                      fieldErrors[`contacts.${idx}.phone`] &&
+                        "border-destructive",
+                    )}
                   />
                 </FormField>
 
-                <FormField label="Email (optional)" htmlFor={`contact_${idx}_email`} error={undefined}>
+                <FormField
+                  label="Email (optional)"
+                  htmlFor={`contact_${idx}_email`}
+                  error={undefined}
+                >
                   <Input
                     id={`contact_${idx}_email`}
                     type="email"
@@ -753,7 +889,10 @@ export function PreRegistrationForm() {
                   onChange={(e) => setContact(idx, "address", e.target.value)}
                   placeholder="Full home address"
                   aria-invalid={!!fieldErrors[`contacts.${idx}.address`]}
-                  className={cn(fieldErrors[`contacts.${idx}.address`] && "border-destructive")}
+                  className={cn(
+                    fieldErrors[`contacts.${idx}.address`] &&
+                      "border-destructive",
+                  )}
                 />
               </FormField>
             </div>
@@ -767,12 +906,18 @@ export function PreRegistrationForm() {
           <input
             type="checkbox"
             checked={values.permissions_checked}
-            onChange={(e) => setValues((v) => ({ ...v, permissions_checked: e.target.checked }))}
+            onChange={(e) =>
+              setValues((v) => ({
+                ...v,
+                permissions_checked: e.target.checked,
+              }))
+            }
             className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
           />
           <span className="text-sm text-foreground">
-            I confirm that the information provided is accurate and I authorize Sunbites canteen to process this
-            pre-registration. I understand that approval is subject to review.
+            I confirm that the information provided is accurate and I authorize
+            Sunbites canteen to process this pre-registration. I understand that
+            approval is subject to review.
           </span>
         </label>
         <FieldError message={fieldErrors.permissions_checked?.[0]} />
@@ -786,7 +931,9 @@ export function PreRegistrationForm() {
           <Input
             id="signatory_name"
             value={values.signatory_name}
-            onChange={(e) => setValues((v) => ({ ...v, signatory_name: e.target.value }))}
+            onChange={(e) =>
+              setValues((v) => ({ ...v, signatory_name: e.target.value }))
+            }
             placeholder="Type your full name as signature"
             aria-invalid={!!fieldErrors.signatory_name}
             className={cn(fieldErrors.signatory_name && "border-destructive")}
@@ -795,7 +942,11 @@ export function PreRegistrationForm() {
 
         <p className="text-xs text-muted-foreground">
           Date:{" "}
-          {new Date().toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" })}
+          {new Date().toLocaleDateString("en-PH", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
         </p>
       </SectionCard>
 

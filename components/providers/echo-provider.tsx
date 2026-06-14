@@ -52,7 +52,11 @@ export function EchoProvider({ children }: EchoProviderProps) {
     };
   }, [token]);
 
-  return <EchoContext.Provider value={token ? echo : null}>{children}</EchoContext.Provider>;
+  return (
+    <EchoContext.Provider value={token ? echo : null}>
+      {children}
+    </EchoContext.Provider>
+  );
 }
 
 export function useEcho(): InstanceType<typeof Echo> | null {

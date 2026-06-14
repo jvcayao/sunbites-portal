@@ -29,7 +29,10 @@ const CATEGORIES = [
 
 type CategoryValue = (typeof CATEGORIES)[number]["value"];
 
-const CATEGORY_VALUES = CATEGORIES.map((c) => c.value) as [CategoryValue, ...CategoryValue[]];
+const CATEGORY_VALUES = CATEGORIES.map((c) => c.value) as [
+  CategoryValue,
+  ...CategoryValue[],
+];
 
 const feedbackSchema = z.object({
   student_id: z.number().optional(),
@@ -43,15 +46,18 @@ type FeedbackFormData = z.infer<typeof feedbackSchema>;
 // ---- Category badge ----
 
 const categoryColors: Record<string, string> = {
-  FoodQuality: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  FoodQuality:
+    "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
   Service: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  PortionSize: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-  Cleanliness: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+  PortionSize:
+    "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  Cleanliness:
+    "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
   General: "bg-muted text-muted-foreground",
 };
 
 const categoryLabel: Record<string, string> = Object.fromEntries(
-  CATEGORIES.map((c) => [c.value, c.label])
+  CATEGORIES.map((c) => [c.value, c.label]),
 );
 
 function CategoryBadge({ category }: { category: string }) {
@@ -60,7 +66,7 @@ function CategoryBadge({ category }: { category: string }) {
       variant="outline"
       className={cn(
         "border-transparent",
-        categoryColors[category] ?? "bg-muted text-muted-foreground"
+        categoryColors[category] ?? "bg-muted text-muted-foreground",
       )}
     >
       {categoryLabel[category] ?? category}
@@ -89,14 +95,20 @@ function StarRating({
             onClick={() => onChange(star)}
             className={cn(
               "text-2xl leading-none transition-colors",
-              (value ?? 0) >= star ? "text-amber-400" : "text-muted-foreground/30 hover:text-amber-300"
+              (value ?? 0) >= star
+                ? "text-amber-400"
+                : "text-muted-foreground/30 hover:text-amber-300",
             )}
           >
             ★
           </button>
         ))}
       </div>
-      {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
+      {error && (
+        <p role="alert" className="text-xs text-destructive">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -122,7 +134,12 @@ function FeedbackForm() {
     mutationFn: feedbackApi.submit,
     onSuccess: () => {
       toast.success("Feedback submitted. Thank you!");
-      setValues({ student_id: undefined, category: undefined, rating: undefined, message: "" });
+      setValues({
+        student_id: undefined,
+        category: undefined,
+        rating: undefined,
+        message: "",
+      });
       setFieldErrors({});
       queryClient.invalidateQueries({ queryKey: ["feedback"] });
     },
@@ -158,7 +175,9 @@ function FeedbackForm() {
               onChange={(e) =>
                 setValues((v) => ({
                   ...v,
-                  student_id: e.target.value ? Number(e.target.value) : undefined,
+                  student_id: e.target.value
+                    ? Number(e.target.value)
+                    : undefined,
                 }))
               }
               className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -179,13 +198,18 @@ function FeedbackForm() {
               id="category-select"
               value={values.category ?? ""}
               onChange={(e) =>
-                setValues((v) => ({ ...v, category: e.target.value as CategoryValue }))
+                setValues((v) => ({
+                  ...v,
+                  category: e.target.value as CategoryValue,
+                }))
               }
               aria-invalid={!!fieldErrors.category}
-              aria-describedby={fieldErrors.category ? "category-error" : undefined}
+              aria-describedby={
+                fieldErrors.category ? "category-error" : undefined
+              }
               className={cn(
                 "h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
-                fieldErrors.category && "border-destructive"
+                fieldErrors.category && "border-destructive",
               )}
             >
               <option value="">Select a category…</option>
@@ -196,7 +220,11 @@ function FeedbackForm() {
               ))}
             </select>
             {fieldErrors.category && (
-              <p id="category-error" role="alert" className="text-xs text-destructive">
+              <p
+                id="category-error"
+                role="alert"
+                className="text-xs text-destructive"
+              >
                 {fieldErrors.category[0]}
               </p>
             )}
@@ -217,16 +245,24 @@ function FeedbackForm() {
               rows={4}
               placeholder="Share your feedback…"
               value={values.message ?? ""}
-              onChange={(e) => setValues((v) => ({ ...v, message: e.target.value }))}
+              onChange={(e) =>
+                setValues((v) => ({ ...v, message: e.target.value }))
+              }
               aria-invalid={!!fieldErrors.message}
-              aria-describedby={fieldErrors.message ? "message-error" : undefined}
+              aria-describedby={
+                fieldErrors.message ? "message-error" : undefined
+              }
               className={cn(
                 "w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 resize-none",
-                fieldErrors.message && "border-destructive"
+                fieldErrors.message && "border-destructive",
               )}
             />
             {fieldErrors.message && (
-              <p id="message-error" role="alert" className="text-xs text-destructive">
+              <p
+                id="message-error"
+                role="alert"
+                className="text-xs text-destructive"
+              >
                 {fieldErrors.message[0]}
               </p>
             )}
@@ -300,7 +336,10 @@ function PreviousFeedbackSection() {
         </p>
       ) : !data?.data.length ? (
         <div className="rounded-xl border border-dashed border-border p-10 text-center">
-          <MessageSquare className="mx-auto mb-2 h-8 w-8 text-muted-foreground/50" aria-hidden="true" />
+          <MessageSquare
+            className="mx-auto mb-2 h-8 w-8 text-muted-foreground/50"
+            aria-hidden="true"
+          />
           <p className="text-sm text-muted-foreground">
             No feedback submitted yet.
           </p>

@@ -4,6 +4,10 @@ export const metadata: Metadata = {
   title: "Sunbites",
 };
 
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
+export default function PublicLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return <>{children}</>;
 }

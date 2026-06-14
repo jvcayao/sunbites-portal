@@ -18,13 +18,17 @@ export const contactSchema = z.object({
   relationship: z.string().min(1, "Relationship is required").max(100),
   phone: z.string().min(1, "Phone number is required").max(30),
   address: z.string().min(1, "Address is required").max(255),
-  email: z.union([z.string().email("Invalid email").max(150), z.literal("")]).optional(),
+  email: z
+    .union([z.string().email("Invalid email").max(150), z.literal("")])
+    .optional(),
   is_primary: z.boolean().default(false),
 });
 
 export const preRegistrationSchema = z
   .object({
-    branch_id: z.number({ error: "Please select a branch" }).min(1, "Please select a branch"),
+    branch_id: z
+      .number({ error: "Please select a branch" })
+      .min(1, "Please select a branch"),
     first_name: z.string().min(1, "First name is required").max(100),
     last_name: z.string().min(1, "Last name is required").max(100),
     student_number: z.union([z.string().max(50), z.literal("")]).optional(),
@@ -40,7 +44,10 @@ export const preRegistrationSchema = z
     subscription_end_year: z.number().optional(),
     signatory_name: z.string().min(1, "Signatory name is required").max(255),
     acknowledged_at: z.string(),
-    contacts: z.array(contactSchema).min(1, "At least one contact is required").max(3),
+    contacts: z
+      .array(contactSchema)
+      .min(1, "At least one contact is required")
+      .max(3),
   })
   .superRefine((data, ctx) => {
     if (data.enrollment_type === "subscription") {

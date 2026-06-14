@@ -16,7 +16,7 @@ const mockAuthState = { parent: { id: 1, name: "Parent" }, token: null };
 jest.mock("@/lib/store/auth", () => ({
   useAuthStore: Object.assign(
     (sel: (s: typeof mockAuthState) => unknown) => sel(mockAuthState),
-    { getState: () => mockAuthState }
+    { getState: () => mockAuthState },
   ),
 }));
 
@@ -27,14 +27,19 @@ jest.mock("next/navigation", () => ({
 function setupHandlers(count = 0, items: ParentNotification[] = []) {
   server.use(
     http.get(`${API}/portal/notifications/unread-count`, () =>
-      HttpResponse.json({ count })
+      HttpResponse.json({ count }),
     ),
     http.get(`${API}/portal/notifications`, () =>
       HttpResponse.json({
         data: items,
-        meta: { current_page: 1, last_page: 1, per_page: 20, total: items.length },
-      })
-    )
+        meta: {
+          current_page: 1,
+          last_page: 1,
+          per_page: 20,
+          total: items.length,
+        },
+      }),
+    ),
   );
 }
 
@@ -43,7 +48,9 @@ describe("NotificationBell (Portal)", () => {
     setupHandlers(0);
     render(<NotificationBell />);
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Notifications" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Notifications" }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -52,7 +59,7 @@ describe("NotificationBell (Portal)", () => {
     render(<NotificationBell />);
     await waitFor(() => {
       expect(
-        screen.getByRole("button", { name: "3 unread notifications" })
+        screen.getByRole("button", { name: "3 unread notifications" }),
       ).toBeInTheDocument();
     });
   });
@@ -61,7 +68,9 @@ describe("NotificationBell (Portal)", () => {
     setupHandlers(0, []);
     render(<NotificationBell />);
     await waitFor(() => screen.getByRole("button", { name: "Notifications" }));
-    await userEvent.click(screen.getByRole("button", { name: "Notifications" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Notifications" }),
+    );
     await waitFor(() => {
       expect(screen.getByText("View all notifications →")).toBeInTheDocument();
     });
@@ -70,7 +79,9 @@ describe("NotificationBell (Portal)", () => {
   it("shows empty state when no notifications", async () => {
     setupHandlers(0, []);
     render(<NotificationBell />);
-    await userEvent.click(screen.getByRole("button", { name: "Notifications" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Notifications" }),
+    );
     await waitFor(() => {
       expect(screen.getByText("You're all caught up")).toBeInTheDocument();
     });

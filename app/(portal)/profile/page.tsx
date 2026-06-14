@@ -93,7 +93,7 @@ function ProfileInfoSection({ profile }: { profile: AuthParent }) {
     id: keyof ProfileFormData,
     label: string,
     type = "text",
-    autocomplete?: string
+    autocomplete?: string,
   ) {
     return (
       <div className="space-y-1.5">
@@ -109,7 +109,11 @@ function ProfileInfoSection({ profile }: { profile: AuthParent }) {
           className={cn(fieldErrors[id] && "border-destructive")}
         />
         {fieldErrors[id] && (
-          <p id={`${id}-error`} role="alert" className="text-xs text-destructive">
+          <p
+            id={`${id}-error`}
+            role="alert"
+            className="text-xs text-destructive"
+          >
             {fieldErrors[id][0]}
           </p>
         )}
@@ -156,7 +160,11 @@ function ChangePasswordSection() {
     mutationFn: profileApi.changePassword,
     onSuccess: () => {
       toast.success("Password changed successfully.");
-      setValues({ current_password: "", password: "", password_confirmation: "" });
+      setValues({
+        current_password: "",
+        password: "",
+        password_confirmation: "",
+      });
       setFieldErrors({});
     },
     onError: (err: ApiError) => {
@@ -188,7 +196,9 @@ function ChangePasswordSection() {
         <Input
           id={`pwd-${id}`}
           type="password"
-          autoComplete={id === "current_password" ? "current-password" : "new-password"}
+          autoComplete={
+            id === "current_password" ? "current-password" : "new-password"
+          }
           value={values[id] ?? ""}
           onChange={(e) => setValues((v) => ({ ...v, [id]: e.target.value }))}
           aria-invalid={!!fieldErrors[id]}
@@ -196,7 +206,11 @@ function ChangePasswordSection() {
           className={cn(fieldErrors[id] && "border-destructive")}
         />
         {fieldErrors[id] && (
-          <p id={`pwd-${id}-error`} role="alert" className="text-xs text-destructive">
+          <p
+            id={`pwd-${id}-error`}
+            role="alert"
+            className="text-xs text-destructive"
+          >
             {fieldErrors[id][0]}
           </p>
         )}
@@ -237,7 +251,10 @@ function ProfilePhotoSection({ profile }: { profile: AuthParent }) {
     mutationFn: profileApi.uploadPhoto,
     onSuccess: (result) => {
       toast.success("Photo updated.");
-      const updatedProfile = { ...profile, profile_photo_url: result.profile_photo_url };
+      const updatedProfile = {
+        ...profile,
+        profile_photo_url: result.profile_photo_url,
+      };
       store.login(store.token!, updatedProfile);
       queryClient.setQueryData(["profile"], updatedProfile);
     },
@@ -331,7 +348,11 @@ function ProfilePageSkeleton() {
 }
 
 export default function ProfilePage() {
-  const { data: profile, isLoading, error } = useQuery({
+  const {
+    data: profile,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["profile"],
     queryFn: profileApi.get,
   });
