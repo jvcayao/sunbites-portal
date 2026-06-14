@@ -45,7 +45,12 @@ export interface DashboardData {
 
 export interface ActivityItem {
   id: number;
-  items: { name: string; quantity: number; price: number; line_total: number }[];
+  items: {
+    name: string;
+    quantity: number;
+    price: number;
+    line_total: number;
+  }[];
   total: number;
   payment_method: "wallet" | "cash" | "gcash" | "subscription";
   created_at: string;

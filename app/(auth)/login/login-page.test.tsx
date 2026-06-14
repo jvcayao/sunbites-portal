@@ -33,7 +33,9 @@ describe("LoginPage (Portal)", () => {
 
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
-    expect(await screen.findByText("Enter a valid email address")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Enter a valid email address"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Password is required")).toBeInTheDocument();
   });
 
@@ -45,14 +47,19 @@ describe("LoginPage (Portal)", () => {
     await user.type(screen.getByLabelText("Password"), "secret");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
-    expect(await screen.findByText("Enter a valid email address")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Enter a valid email address"),
+    ).toBeInTheDocument();
   });
 
   it("redirects to /dashboard on successful login", async () => {
     const user = userEvent.setup();
     render(<LoginPage />);
 
-    await user.type(screen.getByLabelText("Email address"), "parent@sunbites.test");
+    await user.type(
+      screen.getByLabelText("Email address"),
+      "parent@sunbites.test",
+    );
     await user.type(screen.getByLabelText("Password"), "password");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
@@ -64,15 +71,18 @@ describe("LoginPage (Portal)", () => {
       http.post(`${API}/portal/auth/login`, () =>
         HttpResponse.json(
           { message: "These credentials do not match our records." },
-          { status: 422 }
-        )
-      )
+          { status: 422 },
+        ),
+      ),
     );
 
     const user = userEvent.setup();
     render(<LoginPage />);
 
-    await user.type(screen.getByLabelText("Email address"), "parent@sunbites.test");
+    await user.type(
+      screen.getByLabelText("Email address"),
+      "parent@sunbites.test",
+    );
     await user.type(screen.getByLabelText("Password"), "wrongpassword");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
@@ -86,15 +96,24 @@ describe("LoginPage (Portal)", () => {
         await new Promise((resolve) => setTimeout(resolve, 100));
         return HttpResponse.json({
           token: "t",
-          parent: { id: 1, first_name: "M", last_name: "S", email: "m@s.com", phone: null },
+          parent: {
+            id: 1,
+            first_name: "M",
+            last_name: "S",
+            email: "m@s.com",
+            phone: null,
+          },
         });
-      })
+      }),
     );
 
     const user = userEvent.setup();
     render(<LoginPage />);
 
-    await user.type(screen.getByLabelText("Email address"), "parent@sunbites.test");
+    await user.type(
+      screen.getByLabelText("Email address"),
+      "parent@sunbites.test",
+    );
     await user.type(screen.getByLabelText("Password"), "password");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 

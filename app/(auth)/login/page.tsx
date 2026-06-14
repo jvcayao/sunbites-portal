@@ -75,8 +75,12 @@ export default function LoginPage() {
       </div>
 
       {notActivated && (
-        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800/30 dark:bg-amber-900/20 dark:text-amber-400" role="alert">
-          Your account has not been activated yet. Check your email for an activation link.
+        <div
+          className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800/30 dark:bg-amber-900/20 dark:text-amber-400"
+          role="alert"
+        >
+          Your account has not been activated yet. Check your email for an
+          activation link.
         </div>
       )}
 
@@ -89,13 +93,19 @@ export default function LoginPage() {
             autoComplete="email"
             placeholder="you@example.com"
             value={values.email ?? ""}
-            onChange={(e) => setValues((v) => ({ ...v, email: e.target.value }))}
+            onChange={(e) =>
+              setValues((v) => ({ ...v, email: e.target.value }))
+            }
             aria-invalid={!!fieldErrors.email}
             aria-describedby={fieldErrors.email ? "email-error" : undefined}
             className={cn(fieldErrors.email && "border-destructive")}
           />
           {fieldErrors.email && (
-            <p id="email-error" role="alert" className="text-xs text-destructive">
+            <p
+              id="email-error"
+              role="alert"
+              className="text-xs text-destructive"
+            >
               {fieldErrors.email[0]}
             </p>
           )}
@@ -121,27 +131,32 @@ export default function LoginPage() {
               setValues((v) => ({ ...v, password: e.target.value }))
             }
             aria-invalid={!!fieldErrors.password}
-            aria-describedby={fieldErrors.password ? "password-error" : undefined}
+            aria-describedby={
+              fieldErrors.password ? "password-error" : undefined
+            }
             className={cn(fieldErrors.password && "border-destructive")}
           />
           {fieldErrors.password && (
-            <p id="password-error" role="alert" className="text-xs text-destructive">
+            <p
+              id="password-error"
+              role="alert"
+              className="text-xs text-destructive"
+            >
               {fieldErrors.password[0]}
             </p>
           )}
         </div>
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={mutation.isPending}
-        >
+        <Button type="submit" className="w-full" disabled={mutation.isPending}>
           {mutation.isPending ? "Signing in…" : "Sign in"}
         </Button>
       </form>
       <p className="mt-4 text-center text-sm text-muted-foreground">
         Want to pre-register your child?{" "}
-        <Link href="/pre-register" className="font-medium text-primary underline-offset-4 hover:underline">
+        <Link
+          href="/pre-register"
+          className="font-medium text-primary underline-offset-4 hover:underline"
+        >
           Click here
         </Link>
       </p>
