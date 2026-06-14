@@ -462,6 +462,47 @@ export default function StudentDetailPage() {
         </div>
       )}
 
+      {/* Meals This Month */}
+      {isSubscription && student?.subscription_monthly_status && (
+        <div className="rounded-xl border border-border bg-card p-4">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+            Meals This Month —{" "}
+            {(() => {
+              const m = student.subscription_monthly_status.month;
+              return m.charAt(0).toUpperCase() + m.slice(1);
+            })()}{" "}
+            {student.subscription_monthly_status.year}
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {Object.entries(student.subscription_monthly_status.categories)
+              .filter(([, s]) => s.allocated > 0)
+              .map(([cat, s]) => (
+                <div
+                  key={cat}
+                  className="rounded-lg border border-border bg-muted/30 p-3 text-center"
+                >
+                  <p className="text-xs font-medium text-muted-foreground capitalize mb-1">{cat}</p>
+                  <p className="text-lg font-bold tabular-nums">
+                    {s.used}
+                    <span className="text-sm font-normal text-muted-foreground"> / {s.allocated}</span>
+                  </p>
+                  <p
+                    className={
+                      s.remaining === 0
+                        ? "text-xs font-semibold text-destructive"
+                        : s.remaining <= 5
+                          ? "text-xs font-semibold text-amber-600"
+                          : "text-xs text-muted-foreground"
+                    }
+                  >
+                    {s.remaining} remaining
+                  </p>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
       {/* Tab bar */}
       <div className="border-b border-border">
         <nav className="-mb-px flex gap-4" aria-label="Student tabs">

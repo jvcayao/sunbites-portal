@@ -1,3 +1,20 @@
+export interface SubscriptionMonthlyCategoryStatus {
+  allocated: number;
+  used: number;
+  remaining: number;
+}
+
+export interface SubscriptionMonthlyStatus {
+  month: string;
+  year: number;
+  categories: {
+    meal: SubscriptionMonthlyCategoryStatus;
+    snack: SubscriptionMonthlyCategoryStatus;
+    drink: SubscriptionMonthlyCategoryStatus;
+    extra: SubscriptionMonthlyCategoryStatus;
+  };
+}
+
 export interface StudentSummary {
   id: number;
   student_number: string;
@@ -8,6 +25,7 @@ export interface StudentSummary {
   wallet_alert_threshold: number;
   enrollment_status: "enrolled" | "paused" | "graduated" | "banned";
   student_type: "subscription" | "non_subscription";
+  subscription_monthly_status: SubscriptionMonthlyStatus | null;
 }
 
 export type StudentDetail = StudentSummary;
