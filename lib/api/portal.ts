@@ -10,6 +10,7 @@ import type {
   StudentDetail,
   WalletData,
 } from "@/types/portal";
+import type { PaymentHistoryEntry } from "@/types/notification";
 
 // --- Profile ---
 
@@ -29,7 +30,7 @@ export const profileApi = {
     password_confirmation: string;
   }) => apiClient.post<{ message: string }>("/portal/profile/change-password", payload),
 
-  uploadPhoto: async (file: File): Promise<{ profile_photo_path: string }> => {
+  uploadPhoto: async (file: File): Promise<{ profile_photo_url: string }> => {
     const { useAuthStore } = await import("@/lib/store/auth");
     const token = useAuthStore.getState().token;
     const formData = new FormData();
@@ -73,6 +74,9 @@ export const studentsApi = {
       `/portal/students/${id}/wallet/alert`,
       { threshold }
     ),
+
+  paymentHistory: (id: number) =>
+    apiClient.get<{ data: PaymentHistoryEntry[] }>(`/portal/students/${id}/payment-history`),
 };
 
 // --- Meal Plan ---

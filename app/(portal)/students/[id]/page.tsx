@@ -1,7 +1,7 @@
 "use client";
 
 import { startTransition, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -15,12 +15,13 @@ import { cn } from "@/lib/utils";
 
 import type { ApiError } from "@/types/auth";
 import type { ActivityItem, Transaction } from "@/types/portal";
+import type { PaymentHistoryEntry } from "@/types/notification";
 
 // ---- Tabs ----
 
-type Tab = "activity" | "wallet";
+type Tab = "activity" | "wallet" | "payment-history";
 
-const tabs: { id: Tab; label: string }[] = [
+const baseTabs: { id: Tab; label: string }[] = [
   { id: "activity", label: "Activity" },
   { id: "wallet", label: "Wallet" },
 ];
@@ -337,6 +338,79 @@ function WalletTab({ studentId }: { studentId: number }) {
   );
 }
 
+// ---- Payment History Tab ----
+
+function PaymentHistoryTab({ studentId }: { studentId: number }) {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["payment-history", studentId],
+    queryFn: () => studentsApi.paymentHistory(studentId),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-12 w-full" />
+        ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    return <p className="text-sm text-muted-foreground">Failed to load payment history.</p>;
+  }
+
+  const payments = data?.data ?? [];
+
+  if (payments.length === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-border p-8 text-center">
+        <p className="text-sm text-muted-foreground">No payment records found.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto rounded-xl border border-border">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-border bg-muted/50">
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Month</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Amount</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Status</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Paid Date</th>
+          </tr>
+        </thead>
+        <tbody className="bg-card">
+          {payments.map((p: PaymentHistoryEntry) => (
+            <tr key={p.id} className="border-b border-border last:border-0">
+              <td className="px-4 py-3 capitalize">
+                {p.school_month} {p.year}
+              </td>
+              <td className="px-4 py-3">{formatPHP(p.amount)}</td>
+              <td className="px-4 py-3">
+                <span
+                  className={cn(
+                    "text-[11px] font-bold px-2 py-0.5 rounded-full border",
+                    p.status === "paid"
+                      ? "bg-green-100 text-green-700 border-green-300"
+                      : "bg-muted text-muted-foreground border-border"
+                  )}
+                >
+                  {p.status === "paid" ? "Paid" : "Unpaid"}
+                </span>
+              </td>
+              <td className="px-4 py-3 text-muted-foreground">
+                {p.paid_at ? new Date(p.paid_at).toLocaleDateString("en-PH") : "—"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 // ---- Main Page ----
 
 function StudentDetailSkeleton() {
@@ -350,8 +424,10 @@ function StudentDetailSkeleton() {
 
 export default function StudentDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const studentId = Number(params.id);
-  const [activeTab, setActiveTab] = useState<Tab>("activity");
+  const initialTab = (searchParams.get("tab") as Tab | null) ?? "activity";
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 
   const { data: studentsData, isLoading: studentsLoading } = useQuery({
     queryKey: ["students"],
@@ -359,6 +435,11 @@ export default function StudentDetailPage() {
   });
 
   const student = studentsData?.data.find((s) => s.id === studentId);
+  const isSubscription = student?.student_type === "subscription";
+
+  const tabs = isSubscription
+    ? [...baseTabs, { id: "payment-history" as Tab, label: "Payment History" }]
+    : baseTabs;
 
   return (
     <div className="space-y-6">
@@ -378,6 +459,47 @@ export default function StudentDetailPage() {
       ) : (
         <div>
           <h1 className="text-2xl font-bold">Student</h1>
+        </div>
+      )}
+
+      {/* Meals This Month */}
+      {isSubscription && student?.subscription_monthly_status && (
+        <div className="rounded-xl border border-border bg-card p-4">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+            Meals This Month —{" "}
+            {(() => {
+              const m = student.subscription_monthly_status.month;
+              return m.charAt(0).toUpperCase() + m.slice(1);
+            })()}{" "}
+            {student.subscription_monthly_status.year}
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {Object.entries(student.subscription_monthly_status.categories)
+              .filter(([, s]) => s.allocated > 0)
+              .map(([cat, s]) => (
+                <div
+                  key={cat}
+                  className="rounded-lg border border-border bg-muted/30 p-3 text-center"
+                >
+                  <p className="text-xs font-medium text-muted-foreground capitalize mb-1">{cat}</p>
+                  <p className="text-lg font-bold tabular-nums">
+                    {s.used}
+                    <span className="text-sm font-normal text-muted-foreground"> / {s.allocated}</span>
+                  </p>
+                  <p
+                    className={
+                      s.remaining === 0
+                        ? "text-xs font-semibold text-destructive"
+                        : s.remaining <= 5
+                          ? "text-xs font-semibold text-amber-600"
+                          : "text-xs text-muted-foreground"
+                    }
+                  >
+                    {s.remaining} remaining
+                  </p>
+                </div>
+              ))}
+          </div>
         </div>
       )}
 
@@ -406,6 +528,8 @@ export default function StudentDetailPage() {
       {/* Tab content */}
       {activeTab === "activity" ? (
         <ActivityTab studentId={studentId} />
+      ) : activeTab === "payment-history" ? (
+        <PaymentHistoryTab studentId={studentId} />
       ) : (
         <WalletTab studentId={studentId} />
       )}

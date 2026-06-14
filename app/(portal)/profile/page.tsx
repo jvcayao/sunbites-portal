@@ -237,7 +237,7 @@ function ProfilePhotoSection({ profile }: { profile: AuthParent }) {
     mutationFn: profileApi.uploadPhoto,
     onSuccess: (result) => {
       toast.success("Photo updated.");
-      const updatedProfile = { ...profile, profile_photo_path: result.profile_photo_path };
+      const updatedProfile = { ...profile, profile_photo_url: result.profile_photo_url };
       store.login(store.token!, updatedProfile);
       queryClient.setQueryData(["profile"], updatedProfile);
     },
@@ -265,9 +265,9 @@ function ProfilePhotoSection({ profile }: { profile: AuthParent }) {
         <div className="flex items-center gap-6">
           {/* Avatar */}
           <div className="relative h-20 w-20 shrink-0">
-            {profile.profile_photo_path ? (
+            {profile.profile_photo_url ? (
               <Image
-                src={profile.profile_photo_path}
+                src={profile.profile_photo_url}
                 alt={`${profile.first_name} ${profile.last_name}`}
                 fill
                 className="rounded-full object-cover"

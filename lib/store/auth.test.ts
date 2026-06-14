@@ -10,7 +10,7 @@ const mockParent: AuthParent = {
   email: "parent@sunbites.test",
   phone: null,
   address: null,
-  profile_photo_path: null,
+  profile_photo_url: null,
   created_at: "2026-01-01T00:00:00.000000Z",
 };
 
