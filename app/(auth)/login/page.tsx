@@ -139,6 +139,12 @@ export default function LoginPage() {
           {mutation.isPending ? "Signing in…" : "Sign in"}
         </Button>
       </form>
+      <p className="mt-4 text-center text-sm text-muted-foreground">
+        Want to pre-register your child?{" "}
+        <Link href="/pre-register" className="font-medium text-primary underline-offset-4 hover:underline">
+          Click here
+        </Link>
+      </p>
     </AuthLayout>
   );
 }

@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, ChevronDown, LogOut, User } from "lucide-react";
 
 import { AppLogo } from "@/components/app-logo";
+import { NotificationBell } from "@/components/notification-bell";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -86,8 +87,9 @@ export function PortalLayout({ children }: PortalLayoutProps) {
             })}
           </nav>
 
-          {/* Right side: user dropdown + mobile menu button */}
+          {/* Right side: notification bell + user dropdown + mobile menu button */}
           <div className="flex items-center gap-2">
+            <NotificationBell />
             {/* User dropdown (desktop) */}
             {parent && (
               <DropdownMenu>

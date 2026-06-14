@@ -4,6 +4,7 @@ import { startTransition, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { PortalLayout } from "@/components/layouts/portal-layout";
+import { EchoProvider } from "@/components/providers/echo-provider";
 import { useAuthStore } from "@/lib/store/auth";
 
 export default function PortalGroupLayout({
@@ -24,5 +25,9 @@ export default function PortalGroupLayout({
   }, [mounted, token, router]);
 
   if (!mounted || !token) return null;
-  return <PortalLayout>{children}</PortalLayout>;
+  return (
+    <EchoProvider>
+      <PortalLayout>{children}</PortalLayout>
+    </EchoProvider>
+  );
 }
