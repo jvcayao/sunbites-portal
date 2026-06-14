@@ -42,8 +42,9 @@ const paymentReminderFixture = {
     school_month: "august",
     school_year: 2026,
     due_date: "2026-08-01",
-    students: [{ id: 42, name: "Juan Santos", amount: 2430 }],
+    students: [{ id: 42, full_name: "Juan Santos", amount: 2430 }],
     total_amount: 2430,
+    note: "If you have already paid, please disregard this notification.",
   },
   read_at: null,
   created_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
@@ -124,6 +125,22 @@ describe("NotificationsPage (Portal)", () => {
     render(<NotificationsPage />);
 
     expect(await screen.findByText(/You're all caught up/i)).toBeInTheDocument();
+  });
+
+  it("detail sheet shows student names and note for a payment reminder", async () => {
+    setupHandlers([paymentReminderFixture]);
+
+    render(<NotificationsPage />);
+
+    const item = await screen.findByRole("button", {
+      name: /payment reminder/i,
+    });
+    await userEvent.click(item);
+
+    expect(await screen.findByText("Juan Santos")).toBeInTheDocument();
+    expect(
+      screen.getByText("If you have already paid, please disregard this notification.")
+    ).toBeInTheDocument();
   });
 
   it("clicking a payment reminder opens the sheet and the view button navigates to /payments", async () => {

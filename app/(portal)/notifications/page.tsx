@@ -179,7 +179,7 @@ function NotificationDetailSheet({
                       <div className="mt-3 space-y-1 border-t border-border pt-3">
                         {notification.data.students.map((s, i) => (
                           <div key={i} className="flex items-center justify-between text-sm">
-                            <span className="text-foreground">{s.name}</span>
+                            <span className="text-foreground">{s.full_name}</span>
                             <span className="font-semibold text-foreground">
                               ₱{s.amount.toLocaleString()}
                             </span>
@@ -194,6 +194,11 @@ function NotificationDetailSheet({
                       </span>
                     </div>
                   </div>
+                  {notification.data.note && (
+                    <p className="mt-3 text-xs italic text-muted-foreground">
+                      {notification.data.note}
+                    </p>
+                  )}
                 </>
               ) : (
                 <>
