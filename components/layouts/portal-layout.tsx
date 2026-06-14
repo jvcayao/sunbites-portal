@@ -67,8 +67,7 @@ export function PortalLayout({ children }: PortalLayoutProps) {
           >
             {navLinks.map((link) => {
               const isActive =
-                pathname === link.href ||
-                pathname.startsWith(`${link.href}/`);
+                pathname === link.href || pathname.startsWith(`${link.href}/`);
               return (
                 <Link
                   key={link.href}
@@ -78,7 +77,7 @@ export function PortalLayout({ children }: PortalLayoutProps) {
                     "rounded-md px-3 py-2 text-sm transition-colors",
                     isActive
                       ? "font-semibold text-primary"
-                      : "text-foreground hover:bg-muted hover:text-foreground"
+                      : "text-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
                   {link.label}
@@ -103,7 +102,10 @@ export function PortalLayout({ children }: PortalLayoutProps) {
                   <span className="font-medium">
                     {parent.first_name} {parent.last_name}
                   </span>
-                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
+                  <ChevronDown
+                    className="h-3.5 w-3.5 text-muted-foreground"
+                    aria-hidden="true"
+                  />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem
@@ -168,7 +170,7 @@ export function PortalLayout({ children }: PortalLayoutProps) {
                       "block rounded-md px-3 py-2 text-sm transition-colors",
                       isActive
                         ? "font-semibold text-primary"
-                        : "text-foreground hover:bg-muted"
+                        : "text-foreground hover:bg-muted",
                     )}
                   >
                     {link.label}

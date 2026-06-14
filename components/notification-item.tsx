@@ -148,7 +148,7 @@ export function NotificationItem({
         className={cn(
           "relative cursor-pointer rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/30 border-l-4",
           config.borderColor,
-          isUnread && "bg-primary/5"
+          isUnread && "bg-primary/5",
         )}
       >
         {/* Main row */}
@@ -163,7 +163,7 @@ export function NotificationItem({
           <span
             className={cn(
               "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
-              config.iconBg
+              config.iconBg,
             )}
           >
             <config.Icon
@@ -177,7 +177,7 @@ export function NotificationItem({
               <p
                 className={cn(
                   "truncate font-semibold text-foreground",
-                  !isUnread && "font-medium text-muted-foreground"
+                  !isUnread && "font-medium text-muted-foreground",
                 )}
               >
                 {title}
@@ -193,7 +193,7 @@ export function NotificationItem({
                   "text-[11px] font-bold px-2.5 py-0.5 rounded-full border",
                   config.badgeBg,
                   config.badgeText,
-                  config.badgeBorder
+                  config.badgeBorder,
                 )}
               >
                 {config.label}
@@ -209,10 +209,7 @@ export function NotificationItem({
             </p>
           </div>
 
-          <div
-            className="shrink-0"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
             {actionsMenu}
           </div>
         </div>
@@ -237,7 +234,7 @@ export function NotificationItem({
     <div
       className={cn(
         "group relative flex cursor-pointer flex-col px-4 py-3 transition-colors hover:bg-muted/50",
-        isUnread && "bg-primary/5"
+        isUnread && "bg-primary/5",
       )}
     >
       {/* Main row */}
@@ -254,7 +251,7 @@ export function NotificationItem({
           aria-hidden="true"
           className={cn(
             "mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full",
-            isUnread ? "bg-primary" : "bg-transparent"
+            isUnread ? "bg-primary" : "bg-transparent",
           )}
         />
 
@@ -262,7 +259,7 @@ export function NotificationItem({
         <span
           className={cn(
             "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full",
-            config.iconBg
+            config.iconBg,
           )}
         >
           <config.Icon
@@ -277,7 +274,9 @@ export function NotificationItem({
             <p
               className={cn(
                 "text-sm",
-                isUnread ? "font-semibold" : "font-medium text-muted-foreground"
+                isUnread
+                  ? "font-semibold"
+                  : "font-medium text-muted-foreground",
               )}
             >
               {title}
@@ -296,10 +295,11 @@ export function NotificationItem({
 
       {/* Inline accordion body (announcements only) */}
       {isAnnouncement && expanded && (
-        <div data-testid="announcement-body" className="ml-[44px] mt-2 border-t pt-2">
-          <p className="text-sm text-foreground">
-            {notification.data.message}
-          </p>
+        <div
+          data-testid="announcement-body"
+          className="ml-[44px] mt-2 border-t pt-2"
+        >
+          <p className="text-sm text-foreground">{notification.data.message}</p>
         </div>
       )}
 

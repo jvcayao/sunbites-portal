@@ -27,7 +27,7 @@ const mockAuthState = { parent: { id: 1, name: "Parent User" }, token: null };
 jest.mock("@/lib/store/auth", () => ({
   useAuthStore: Object.assign(
     (sel: (s: typeof mockAuthState) => unknown) => sel(mockAuthState),
-    { getState: () => mockAuthState }
+    { getState: () => mockAuthState },
   ),
 }));
 
@@ -76,7 +76,12 @@ function setupHandlers(
     http.get(`${API}/portal/notifications`, () =>
       HttpResponse.json({
         data: notifications,
-        meta: { current_page: 1, last_page: 1, per_page: 20, total: notifications.length },
+        meta: {
+          current_page: 1,
+          last_page: 1,
+          per_page: 20,
+          total: notifications.length,
+        },
       }),
     ),
     http.get(`${API}/portal/notifications/unread-count`, () =>
@@ -103,9 +108,7 @@ describe("NotificationsPage (Portal)", () => {
     render(<NotificationsPage />);
 
     expect(await screen.findByText("Payment Reminder")).toBeInTheDocument();
-    expect(
-      screen.getByText("august 2026 — ₱2,430 due")
-    ).toBeInTheDocument();
+    expect(screen.getByText("august 2026 — ₱2,430 due")).toBeInTheDocument();
   });
 
   it("renders an announcement with its title and message", async () => {
@@ -113,9 +116,13 @@ describe("NotificationsPage (Portal)", () => {
 
     render(<NotificationsPage />);
 
-    expect(await screen.findByText("Canteen closure notice")).toBeInTheDocument();
     expect(
-      screen.getByText("The canteen will be closed on Friday due to maintenance.")
+      await screen.findByText("Canteen closure notice"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "The canteen will be closed on Friday due to maintenance.",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -124,7 +131,9 @@ describe("NotificationsPage (Portal)", () => {
 
     render(<NotificationsPage />);
 
-    expect(await screen.findByText(/You're all caught up/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/You're all caught up/i),
+    ).toBeInTheDocument();
   });
 
   it("detail sheet shows student names and note for a payment reminder", async () => {
@@ -139,7 +148,9 @@ describe("NotificationsPage (Portal)", () => {
 
     expect(await screen.findByText("Juan Santos")).toBeInTheDocument();
     expect(
-      screen.getByText("If you have already paid, please disregard this notification.")
+      screen.getByText(
+        "If you have already paid, please disregard this notification.",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -154,7 +165,9 @@ describe("NotificationsPage (Portal)", () => {
 
     await userEvent.click(item);
 
-    const viewBtn = await screen.findByRole("button", { name: /view payments/i });
+    const viewBtn = await screen.findByRole("button", {
+      name: /view payments/i,
+    });
     await userEvent.click(viewBtn);
 
     await waitFor(() => {
@@ -200,7 +213,7 @@ describe("NotificationsPage (Portal)", () => {
 
     await waitFor(() => {
       expect(
-        screen.getAllByRole("button", { name: /payment reminder/i })
+        screen.getAllByRole("button", { name: /payment reminder/i }),
       ).toHaveLength(1);
     });
   });

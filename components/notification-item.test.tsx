@@ -49,7 +49,7 @@ describe("NotificationItem (Portal)", () => {
         onDelete={noop}
         isMarkingRead={false}
         isDeleting={false}
-      />
+      />,
     );
     expect(screen.getByText("Holiday Notice")).toHaveClass("font-semibold");
   });
@@ -62,9 +62,11 @@ describe("NotificationItem (Portal)", () => {
         onDelete={noop}
         isMarkingRead={false}
         isDeleting={false}
-      />
+      />,
     );
-    await userEvent.click(screen.getByRole("button", { name: /holiday notice/i }));
+    await userEvent.click(
+      screen.getByRole("button", { name: /holiday notice/i }),
+    );
     await waitFor(() => {
       expect(screen.getByText("School is closed on June 20.")).toBeVisible();
     });
@@ -79,11 +81,15 @@ describe("NotificationItem (Portal)", () => {
         onDelete={noop}
         isMarkingRead={false}
         isDeleting={false}
-      />
+      />,
     );
-    await userEvent.click(screen.getByRole("button", { name: /holiday notice/i }));
+    await userEvent.click(
+      screen.getByRole("button", { name: /holiday notice/i }),
+    );
     await waitFor(() => screen.getByText("School is closed on June 20."));
-    await userEvent.click(screen.getByRole("button", { name: /holiday notice/i }));
+    await userEvent.click(
+      screen.getByRole("button", { name: /holiday notice/i }),
+    );
     await waitFor(() => {
       expect(screen.queryByTestId("announcement-body")).not.toBeInTheDocument();
     });
@@ -99,9 +105,11 @@ describe("NotificationItem (Portal)", () => {
         isMarkingRead={false}
         isDeleting={false}
         onNavigate={onNavigate}
-      />
+      />,
     );
-    await userEvent.click(screen.getByRole("button", { name: /payment reminder/i }));
+    await userEvent.click(
+      screen.getByRole("button", { name: /payment reminder/i }),
+    );
     expect(mockPush).toHaveBeenCalledWith("/payments");
     expect(onNavigate).toHaveBeenCalled();
   });

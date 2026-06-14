@@ -2,13 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, CheckCheck, CreditCard, ExternalLink, Trash2 } from "lucide-react";
+import {
+  Bell,
+  CheckCheck,
+  CreditCard,
+  ExternalLink,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { NotificationItem } from "@/components/notification-item";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Sheet,
   SheetContent,
@@ -31,22 +41,32 @@ interface Props {
 }
 
 function groupByDate(
-  items: ParentNotification[]
+  items: ParentNotification[],
 ): { label: string; items: ParentNotification[] }[] {
   const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+  );
   const startOfYesterday = new Date(startOfToday.getTime() - 86_400_000);
   return [
-    { label: "Today", items: items.filter((n) => new Date(n.created_at) >= startOfToday) },
+    {
+      label: "Today",
+      items: items.filter((n) => new Date(n.created_at) >= startOfToday),
+    },
     {
       label: "Yesterday",
       items: items.filter(
         (n) =>
           new Date(n.created_at) >= startOfYesterday &&
-          new Date(n.created_at) < startOfToday
+          new Date(n.created_at) < startOfToday,
       ),
     },
-    { label: "Earlier", items: items.filter((n) => new Date(n.created_at) < startOfYesterday) },
+    {
+      label: "Earlier",
+      items: items.filter((n) => new Date(n.created_at) < startOfYesterday),
+    },
   ].filter((g) => g.items.length > 0);
 }
 
@@ -86,7 +106,7 @@ function NotificationDetailSheet({
                     "text-[11px] font-bold px-2.5 py-0.5 rounded-full border",
                     isPayment
                       ? "bg-red-100 text-red-700 border-red-300"
-                      : "bg-amber-100 text-amber-700 border-amber-300"
+                      : "bg-amber-100 text-amber-700 border-amber-300",
                   )}
                 >
                   {isPayment ? "Payment" : "Announcement"}
@@ -124,13 +144,16 @@ function NotificationDetailSheet({
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Period</span>
                       <span className="font-medium capitalize">
-                        {notification.data.school_month} {notification.data.school_year}
+                        {notification.data.school_month}{" "}
+                        {notification.data.school_year}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Due date</span>
                       <span className="font-medium">
-                        {new Date(notification.data.due_date).toLocaleDateString("en-PH", {
+                        {new Date(
+                          notification.data.due_date,
+                        ).toLocaleDateString("en-PH", {
                           month: "short",
                           day: "numeric",
                           year: "numeric",
@@ -140,7 +163,10 @@ function NotificationDetailSheet({
                     {notification.data.students.length > 0 && (
                       <div className="mt-3 space-y-1 border-t border-border pt-3">
                         {notification.data.students.map((s, i) => (
-                          <div key={i} className="flex items-center justify-between text-sm">
+                          <div
+                            key={i}
+                            className="flex items-center justify-between text-sm"
+                          >
                             <span className="text-foreground">{s.name}</span>
                             <span className="font-semibold text-foreground">
                               ₱{s.amount.toLocaleString()}
@@ -189,21 +215,29 @@ function NotificationDetailSheet({
                   size="sm"
                   onClick={() => {
                     onClose();
-                    const firstWithId = notification.data.students.find((s) => s.id != null);
+                    const firstWithId = notification.data.students.find(
+                      (s) => s.id != null,
+                    );
                     router.push(
                       firstWithId
                         ? `/students/${firstWithId.id}?tab=payment-history`
-                        : "/students"
+                        : "/students",
                     );
                   }}
                 >
-                  <CreditCard className="h-3.5 w-3.5 mr-1.5" aria-hidden="true" />
+                  <CreditCard
+                    className="h-3.5 w-3.5 mr-1.5"
+                    aria-hidden="true"
+                  />
                   View Payments
                 </Button>
               )}
               {isAnnouncement && (
                 <Button variant="outline" size="sm" onClick={onClose}>
-                  <ExternalLink className="h-3.5 w-3.5 mr-1.5" aria-hidden="true" />
+                  <ExternalLink
+                    className="h-3.5 w-3.5 mr-1.5"
+                    aria-hidden="true"
+                  />
                   Close
                 </Button>
               )}
@@ -250,16 +284,25 @@ function NotificationPanel({
     mutationFn: (id: string) => notificationApi.markRead(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ["notifications"] });
-      const prev = queryClient.getQueryData(["notifications"]) as NotificationListResponse | undefined;
-      queryClient.setQueryData(["notifications"], (old: NotificationListResponse | undefined) => ({
-        ...old,
-        data: old?.data?.map((n: ParentNotification) =>
-          n.id === id ? { ...n, read_at: new Date().toISOString() } : n
-        ),
-      }));
+      const prev = queryClient.getQueryData(["notifications"]) as
+        | NotificationListResponse
+        | undefined;
+      queryClient.setQueryData(
+        ["notifications"],
+        (old: NotificationListResponse | undefined) => ({
+          ...old,
+          data: old?.data?.map((n: ParentNotification) =>
+            n.id === id ? { ...n, read_at: new Date().toISOString() } : n,
+          ),
+        }),
+      );
       return { prev };
     },
-    onError: (_err: unknown, _id: string, ctx: { prev: NotificationListResponse | undefined } | undefined) => {
+    onError: (
+      _err: unknown,
+      _id: string,
+      ctx: { prev: NotificationListResponse | undefined } | undefined,
+    ) => {
       if (ctx?.prev) queryClient.setQueryData(["notifications"], ctx.prev);
     },
     onSettled: () => invalidateAll(),
@@ -269,14 +312,23 @@ function NotificationPanel({
     mutationFn: (id: string) => notificationApi.destroy(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ["notifications"] });
-      const prev = queryClient.getQueryData(["notifications"]) as NotificationListResponse | undefined;
-      queryClient.setQueryData(["notifications"], (old: NotificationListResponse | undefined) => ({
-        ...old,
-        data: old?.data?.filter((n: ParentNotification) => n.id !== id),
-      }));
+      const prev = queryClient.getQueryData(["notifications"]) as
+        | NotificationListResponse
+        | undefined;
+      queryClient.setQueryData(
+        ["notifications"],
+        (old: NotificationListResponse | undefined) => ({
+          ...old,
+          data: old?.data?.filter((n: ParentNotification) => n.id !== id),
+        }),
+      );
       return { prev };
     },
-    onError: (_err: unknown, _id: string, ctx: { prev: NotificationListResponse | undefined } | undefined) => {
+    onError: (
+      _err: unknown,
+      _id: string,
+      ctx: { prev: NotificationListResponse | undefined } | undefined,
+    ) => {
       if (ctx?.prev) queryClient.setQueryData(["notifications"], ctx.prev);
     },
     onSettled: () => invalidateAll(),
@@ -333,9 +385,14 @@ function NotificationPanel({
 
         {!isLoading && notifications.length === 0 && (
           <div className="flex flex-col items-center justify-center py-10 text-center">
-            <Bell className="mb-2 h-8 w-8 text-muted-foreground" aria-hidden="true" />
+            <Bell
+              className="mb-2 h-8 w-8 text-muted-foreground"
+              aria-hidden="true"
+            />
             <p className="text-sm font-medium">You&apos;re all caught up</p>
-            <p className="text-xs text-muted-foreground">No new notifications</p>
+            <p className="text-xs text-muted-foreground">
+              No new notifications
+            </p>
           </div>
         )}
 
@@ -352,10 +409,12 @@ function NotificationPanel({
                   onMarkRead={(id) => markReadMutation.mutate(id)}
                   onDelete={(id) => deleteMutation.mutate(id)}
                   isMarkingRead={
-                    markReadMutation.isPending && markReadMutation.variables === n.id
+                    markReadMutation.isPending &&
+                    markReadMutation.variables === n.id
                   }
                   isDeleting={
-                    deleteMutation.isPending && deleteMutation.variables === n.id
+                    deleteMutation.isPending &&
+                    deleteMutation.variables === n.id
                   }
                   onNavigate={onClose}
                   onCardClick={() => handleOpen(n)}
@@ -408,14 +467,23 @@ export function NotificationBell({ className }: Props) {
     mutationFn: (id: string) => notificationApi.destroy(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ["notifications"] });
-      const prev = queryClient.getQueryData(["notifications"]) as NotificationListResponse | undefined;
-      queryClient.setQueryData(["notifications"], (old: NotificationListResponse | undefined) => ({
-        ...old,
-        data: old?.data?.filter((n: ParentNotification) => n.id !== id),
-      }));
+      const prev = queryClient.getQueryData(["notifications"]) as
+        | NotificationListResponse
+        | undefined;
+      queryClient.setQueryData(
+        ["notifications"],
+        (old: NotificationListResponse | undefined) => ({
+          ...old,
+          data: old?.data?.filter((n: ParentNotification) => n.id !== id),
+        }),
+      );
       return { prev };
     },
-    onError: (_err: unknown, _id: string, ctx: { prev: NotificationListResponse | undefined } | undefined) => {
+    onError: (
+      _err: unknown,
+      _id: string,
+      ctx: { prev: NotificationListResponse | undefined } | undefined,
+    ) => {
       if (ctx?.prev) queryClient.setQueryData(["notifications"], ctx.prev);
     },
     onSettled: () => {
@@ -450,11 +518,13 @@ export function NotificationBell({ className }: Props) {
             <button
               type="button"
               aria-label={
-                unreadCount > 0 ? `${unreadCount} unread notifications` : "Notifications"
+                unreadCount > 0
+                  ? `${unreadCount} unread notifications`
+                  : "Notifications"
               }
               className={cn(
                 "relative flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-muted",
-                className
+                className,
               )}
             />
           }

@@ -29,7 +29,9 @@ const baseTabs: { id: Tab; label: string }[] = [
 // ---- Activity Tab ----
 
 function ActivityItemRow({ item }: { item: ActivityItem }) {
-  const itemNames = item.items.map((i) => `${i.name} x${i.quantity}`).join(", ");
+  const itemNames = item.items
+    .map((i) => `${i.name} x${i.quantity}`)
+    .join(", ");
   return (
     <tr className="border-b border-border last:border-0">
       <td className="px-4 py-3 text-sm text-muted-foreground">
@@ -171,7 +173,7 @@ function TransactionRow({ tx }: { tx: Transaction }) {
       <td
         className={cn(
           "px-4 py-3 text-right text-sm font-semibold tabular-nums",
-          isCredit ? "text-green-600 dark:text-green-400" : "text-destructive"
+          isCredit ? "text-green-600 dark:text-green-400" : "text-destructive",
         )}
       >
         {isCredit ? "+" : ""}
@@ -198,11 +200,14 @@ function WalletTab({ studentId }: { studentId: number }) {
   }, [data, alertEditing]);
 
   const alertMutation = useMutation({
-    mutationFn: (threshold: number) => studentsApi.setAlert(studentId, threshold),
+    mutationFn: (threshold: number) =>
+      studentsApi.setAlert(studentId, threshold),
     onSuccess: () => {
       toast.success("Wallet alert threshold updated.");
       setAlertEditing(false);
-      queryClient.invalidateQueries({ queryKey: ["student-wallet", studentId] });
+      queryClient.invalidateQueries({
+        queryKey: ["student-wallet", studentId],
+      });
     },
     onError: (err: ApiError) => {
       toast.error(err.message ?? "Failed to update threshold.");
@@ -307,7 +312,9 @@ function WalletTab({ studentId }: { studentId: number }) {
         <h3 className="mb-3 text-sm font-semibold">Recent Transactions</h3>
         {data.data.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border p-8 text-center">
-            <p className="text-sm text-muted-foreground">No transactions yet.</p>
+            <p className="text-sm text-muted-foreground">
+              No transactions yet.
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-border">
@@ -357,7 +364,11 @@ function PaymentHistoryTab({ studentId }: { studentId: number }) {
   }
 
   if (isError) {
-    return <p className="text-sm text-muted-foreground">Failed to load payment history.</p>;
+    return (
+      <p className="text-sm text-muted-foreground">
+        Failed to load payment history.
+      </p>
+    );
   }
 
   const payments = data?.data ?? [];
@@ -365,7 +376,9 @@ function PaymentHistoryTab({ studentId }: { studentId: number }) {
   if (payments.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border p-8 text-center">
-        <p className="text-sm text-muted-foreground">No payment records found.</p>
+        <p className="text-sm text-muted-foreground">
+          No payment records found.
+        </p>
       </div>
     );
   }
@@ -375,10 +388,18 @@ function PaymentHistoryTab({ studentId }: { studentId: number }) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border bg-muted/50">
-            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Month</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Amount</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Status</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Paid Date</th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+              Month
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+              Amount
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+              Status
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+              Paid Date
+            </th>
           </tr>
         </thead>
         <tbody className="bg-card">
@@ -394,14 +415,16 @@ function PaymentHistoryTab({ studentId }: { studentId: number }) {
                     "text-[11px] font-bold px-2 py-0.5 rounded-full border",
                     p.status === "paid"
                       ? "bg-green-100 text-green-700 border-green-300"
-                      : "bg-muted text-muted-foreground border-border"
+                      : "bg-muted text-muted-foreground border-border",
                   )}
                 >
                   {p.status === "paid" ? "Paid" : "Unpaid"}
                 </span>
               </td>
               <td className="px-4 py-3 text-muted-foreground">
-                {p.paid_at ? new Date(p.paid_at).toLocaleDateString("en-PH") : "—"}
+                {p.paid_at
+                  ? new Date(p.paid_at).toLocaleDateString("en-PH")
+                  : "—"}
               </td>
             </tr>
           ))}
@@ -481,10 +504,15 @@ export default function StudentDetailPage() {
                   key={cat}
                   className="rounded-lg border border-border bg-muted/30 p-3 text-center"
                 >
-                  <p className="text-xs font-medium text-muted-foreground capitalize mb-1">{cat}</p>
+                  <p className="text-xs font-medium text-muted-foreground capitalize mb-1">
+                    {cat}
+                  </p>
                   <p className="text-lg font-bold tabular-nums">
                     {s.used}
-                    <span className="text-sm font-normal text-muted-foreground"> / {s.allocated}</span>
+                    <span className="text-sm font-normal text-muted-foreground">
+                      {" "}
+                      / {s.allocated}
+                    </span>
                   </p>
                   <p
                     className={
@@ -516,7 +544,7 @@ export default function StudentDetailPage() {
                 "border-b-2 pb-3 text-sm font-medium transition-colors",
                 activeTab === tab.id
                   ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
               )}
             >
               {tab.label}

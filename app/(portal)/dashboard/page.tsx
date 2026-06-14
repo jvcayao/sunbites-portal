@@ -40,7 +40,9 @@ function StudentCard({ student }: { student: StudentSummary }) {
       aria-label={`View details for ${student.full_name}`}
     >
       <div className="flex items-start justify-between gap-2 mb-1">
-        <p className="font-semibold text-base leading-tight">{student.full_name}</p>
+        <p className="font-semibold text-base leading-tight">
+          {student.full_name}
+        </p>
         <EnrollmentStatusBadge status={student.enrollment_status} />
       </div>
 
@@ -63,7 +65,10 @@ function StudentCard({ student }: { student: StudentSummary }) {
       <div className="pt-3 border-t border-border flex items-end justify-between">
         <div>
           <div className="flex items-center gap-1.5">
-            <Wallet className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            <Wallet
+              className="h-4 w-4 text-muted-foreground"
+              aria-hidden="true"
+            />
             <span className="text-lg font-bold tabular-nums">
               {formatPHP(student.wallet_balance)}
             </span>
@@ -98,7 +103,10 @@ function isWithinDateFilter(dateStr: string, filter: DateFilter): boolean {
     return date >= startOfWeek;
   }
   if (filter === "month") {
-    return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
+    return (
+      date.getFullYear() === now.getFullYear() &&
+      date.getMonth() === now.getMonth()
+    );
   }
   return true;
 }
@@ -106,7 +114,9 @@ function isWithinDateFilter(dateStr: string, filter: DateFilter): boolean {
 function RecentOrderRow({ order }: { order: RecentOrder }) {
   return (
     <tr className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-      <td className="px-4 py-3 text-sm font-medium">{order.student_full_name}</td>
+      <td className="px-4 py-3 text-sm font-medium">
+        {order.student_full_name}
+      </td>
       <td className="px-4 py-3 text-sm text-muted-foreground">
         {formatDate(order.created_at)}
       </td>
@@ -137,8 +147,10 @@ function RecentOrdersSection({
   const [dateFilter, setDateFilter] = useState<DateFilter>("all");
 
   const filtered = orders.filter((o) => {
-    const byStudent = studentFilter === "all" || o.student_full_name === studentFilter;
-    const byMethod = methodFilter === "all" || o.payment_method === methodFilter;
+    const byStudent =
+      studentFilter === "all" || o.student_full_name === studentFilter;
+    const byMethod =
+      methodFilter === "all" || o.payment_method === methodFilter;
     const byDate = isWithinDateFilter(o.created_at, dateFilter);
     return byStudent && byMethod && byDate;
   });
@@ -151,7 +163,10 @@ function RecentOrdersSection({
         <h2 id="orders-heading" className="text-base font-semibold">
           Recent Orders
         </h2>
-        <ShoppingBag className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+        <ShoppingBag
+          className="h-4 w-4 text-muted-foreground"
+          aria-hidden="true"
+        />
       </div>
 
       {/* Filters */}
@@ -172,7 +187,11 @@ function RecentOrdersSection({
           </select>
         )}
 
-        <div className="flex items-center gap-1" role="group" aria-label="Filter by payment method">
+        <div
+          className="flex items-center gap-1"
+          role="group"
+          aria-label="Filter by payment method"
+        >
           {(["all", "cash", "wallet"] as const).map((m) => (
             <button
               key={m}
@@ -182,7 +201,7 @@ function RecentOrdersSection({
                 "rounded-full px-3 py-1 text-xs font-medium transition-colors",
                 methodFilter === m
                   ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:text-foreground"
+                  : "bg-muted text-muted-foreground hover:text-foreground",
               )}
             >
               {m === "all" ? "All" : m.charAt(0).toUpperCase() + m.slice(1)}
@@ -190,7 +209,11 @@ function RecentOrdersSection({
           ))}
         </div>
 
-        <div className="flex items-center gap-1" role="group" aria-label="Filter by date">
+        <div
+          className="flex items-center gap-1"
+          role="group"
+          aria-label="Filter by date"
+        >
           {(["all", "today", "week", "month"] as const).map((d) => (
             <button
               key={d}
@@ -200,7 +223,7 @@ function RecentOrdersSection({
                 "rounded-full px-3 py-1 text-xs font-medium transition-colors",
                 dateFilter === d
                   ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:text-foreground"
+                  : "bg-muted text-muted-foreground hover:text-foreground",
               )}
             >
               {DATE_FILTER_LABELS[d]}
@@ -210,7 +233,8 @@ function RecentOrdersSection({
 
         {filtered.length > 0 && (
           <p className="ml-auto text-xs text-muted-foreground tabular-nums">
-            {filtered.length} order{filtered.length !== 1 ? "s" : ""} &middot; {formatPHP(totalAmount)}
+            {filtered.length} order{filtered.length !== 1 ? "s" : ""} &middot;{" "}
+            {formatPHP(totalAmount)}
           </p>
         )}
       </div>
@@ -218,7 +242,9 @@ function RecentOrdersSection({
       {/* Table */}
       {!filtered.length ? (
         <div className="rounded-2xl border border-dashed border-border p-8 text-center">
-          <p className="text-sm text-muted-foreground">No orders match the selected filters.</p>
+          <p className="text-sm text-muted-foreground">
+            No orders match the selected filters.
+          </p>
         </div>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
@@ -226,23 +252,42 @@ function RecentOrdersSection({
             <thead>
               <tr className="border-b border-border bg-muted/50">
                 {students.length > 1 && (
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Student</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                    Student
+                  </th>
                 )}
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Date</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Method</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Total</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                  Date
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                  Method
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">
+                  Total
+                </th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((order) => (
-                <tr key={order.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                <tr
+                  key={order.id}
+                  className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
+                >
                   {students.length > 1 && (
-                    <td className="px-4 py-3 text-sm font-medium">{order.student_full_name}</td>
+                    <td className="px-4 py-3 text-sm font-medium">
+                      {order.student_full_name}
+                    </td>
                   )}
-                  <td className="px-4 py-3 text-sm text-muted-foreground">{formatDate(order.created_at)}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">
+                    {formatDate(order.created_at)}
+                  </td>
                   <td className="px-4 py-3 text-sm">
                     <Badge
-                      variant={order.payment_method === "wallet" ? "default" : "secondary"}
+                      variant={
+                        order.payment_method === "wallet"
+                          ? "default"
+                          : "secondary"
+                      }
                       className="rounded-full text-xs capitalize"
                     >
                       {order.payment_method === "wallet" ? "Wallet" : "Cash"}
@@ -309,7 +354,9 @@ export default function DashboardPage() {
       {/* Recent Orders */}
       {isLoading ? (
         <section aria-labelledby="orders-heading">
-          <h2 id="orders-heading" className="text-base font-semibold mb-3">Recent Orders</h2>
+          <h2 id="orders-heading" className="text-base font-semibold mb-3">
+            Recent Orders
+          </h2>
           <div className="space-y-2">
             {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-12 w-full rounded-xl" />

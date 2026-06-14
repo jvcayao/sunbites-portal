@@ -28,7 +28,11 @@ export const profileApi = {
     current_password: string;
     password: string;
     password_confirmation: string;
-  }) => apiClient.post<{ message: string }>("/portal/profile/change-password", payload),
+  }) =>
+    apiClient.post<{ message: string }>(
+      "/portal/profile/change-password",
+      payload,
+    ),
 
   uploadPhoto: async (file: File): Promise<{ profile_photo_url: string }> => {
     const { useAuthStore } = await import("@/lib/store/auth");
@@ -38,9 +42,15 @@ export const profileApi = {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/portal/profile/photo`;
     const headers: Record<string, string> = { Accept: "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
-    const response = await fetch(url, { method: "POST", headers, body: formData });
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
     if (!response.ok) {
-      const err = await response.json().catch(() => ({ message: "Upload failed." }));
+      const err = await response
+        .json()
+        .catch(() => ({ message: "Upload failed." }));
       throw err;
     }
     return response.json();
@@ -72,11 +82,13 @@ export const studentsApi = {
   setAlert: (id: number, threshold: number) =>
     apiClient.patch<{ message: string }>(
       `/portal/students/${id}/wallet/alert`,
-      { threshold }
+      { threshold },
     ),
 
   paymentHistory: (id: number) =>
-    apiClient.get<{ data: PaymentHistoryEntry[] }>(`/portal/students/${id}/payment-history`),
+    apiClient.get<{ data: PaymentHistoryEntry[] }>(
+      `/portal/students/${id}/payment-history`,
+    ),
 };
 
 // --- Meal Plan ---
@@ -105,12 +117,15 @@ export const feedbackApi = {
 
 export const portalAuthApi = {
   forgotPassword: (email: string) =>
-    apiClient.post<{ message: string }>("/portal/auth/password/email", { email }),
+    apiClient.post<{ message: string }>("/portal/auth/password/email", {
+      email,
+    }),
 
   resetPassword: (payload: {
     token: string;
     email: string;
     password: string;
     password_confirmation: string;
-  }) => apiClient.post<{ message: string }>("/portal/auth/password/reset", payload),
+  }) =>
+    apiClient.post<{ message: string }>("/portal/auth/password/reset", payload),
 };

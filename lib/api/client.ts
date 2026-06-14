@@ -8,7 +8,10 @@ interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
 }
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+async function request<T>(
+  path: string,
+  options: RequestOptions = {},
+): Promise<T> {
   const { params, ...init } = options;
   const store = useAuthStore.getState();
 
@@ -37,7 +40,9 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   }
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: "An error occurred." }));
+    const error = await response
+      .json()
+      .catch(() => ({ message: "An error occurred." }));
     throw error as ApiError;
   }
 
@@ -49,11 +54,19 @@ export const apiClient = {
   get: <T>(path: string, options?: RequestOptions) =>
     request<T>(path, { ...options, method: "GET" }),
   post: <T>(path: string, body?: unknown, options?: RequestOptions) =>
-    request<T>(path, { ...options, method: "POST", body: JSON.stringify(body) }),
+    request<T>(path, {
+      ...options,
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
   put: <T>(path: string, body?: unknown, options?: RequestOptions) =>
     request<T>(path, { ...options, method: "PUT", body: JSON.stringify(body) }),
   patch: <T>(path: string, body?: unknown, options?: RequestOptions) =>
-    request<T>(path, { ...options, method: "PATCH", body: JSON.stringify(body) }),
+    request<T>(path, {
+      ...options,
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
   delete: <T>(path: string, options?: RequestOptions) =>
     request<T>(path, { ...options, method: "DELETE" }),
 };

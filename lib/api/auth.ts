@@ -16,6 +16,5 @@ export const authApi = {
   login: (payload: LoginPayload) =>
     apiClient.post<LoginResponse>("/portal/auth/login", payload),
 
-  logout: () =>
-    apiClient.post<void>("/portal/auth/logout"),
+  logout: () => apiClient.post<void>("/portal/auth/logout"),
 };
