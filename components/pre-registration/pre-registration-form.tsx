@@ -863,7 +863,7 @@ export function PreRegistrationForm() {
                 </FormField>
 
                 <FormField
-                  label="Email (optional)"
+                  label="Email (For Parent's Portal access)"
                   htmlFor={`contact_${idx}_email`}
                   error={undefined}
                 >
