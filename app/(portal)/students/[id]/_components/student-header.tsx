@@ -29,16 +29,17 @@ function getInitials(fullName: string): string {
     .join("");
 }
 
-export function StudentHeader({ student, onPhotoUploaded, className }: StudentHeaderProps) {
+export function StudentHeader({
+  student,
+  onPhotoUploaded,
+  className,
+}: StudentHeaderProps) {
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!student.photo_url) {
-      setBlobUrl(null);
-      return;
-    }
+    if (!student.photo_url) return;
 
     let aborted = false;
     let fetchedUrl: string | null = null;
@@ -57,6 +58,9 @@ export function StudentHeader({ student, onPhotoUploaded, className }: StudentHe
       if (fetchedUrl) URL.revokeObjectURL(fetchedUrl);
     };
   }, [student.id, student.photo_url]);
+
+  // Derive display URL: when photo_url is null, don't show a stale blob
+  const displayUrl = student.photo_url ? blobUrl : null;
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -83,12 +87,14 @@ export function StudentHeader({ student, onPhotoUploaded, className }: StudentHe
   const isSubscription = student.student_type === "subscription";
 
   return (
-    <div className={cn("rounded-xl border border-border bg-card p-5", className)}>
+    <div
+      className={cn("rounded-xl border border-border bg-card p-5", className)}
+    >
       <div className="flex flex-wrap items-start gap-5">
         {/* Avatar with upload overlay */}
         <div className="relative shrink-0">
           <Avatar className="h-20 w-20">
-            {blobUrl && <AvatarImage src={blobUrl} alt={student.full_name} />}
+            {displayUrl && <AvatarImage src={displayUrl} alt={student.full_name} />}
             <AvatarFallback className="text-xl font-semibold">
               {getInitials(student.full_name)}
             </AvatarFallback>
