@@ -83,12 +83,14 @@ export function OrderHistoryTab({ studentId }: OrderHistoryTabProps) {
     <div className="space-y-4">
       {/* Filters */}
       <div className="space-y-2">
-        <FilterPills pills={METHOD_PILLS} active={methodFilter} onSelect={handleMethodChange} />
-        <FilterPills pills={TIME_PILLS} active={timeFilter} onSelect={handleTimeChange} />
+        <FilterPills pills={METHOD_PILLS} active={methodFilter} onSelect={handleMethodChange} ariaLabel="Filter by payment method" />
+        <FilterPills pills={TIME_PILLS} active={timeFilter} onSelect={handleTimeChange} ariaLabel="Filter by time" />
       </div>
 
       {/* Summary */}
-      {data && (
+      {isLoading ? (
+        <Skeleton className="h-5 w-48" />
+      ) : data ? (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             Total spent:{" "}
@@ -100,7 +102,7 @@ export function OrderHistoryTab({ studentId }: OrderHistoryTabProps) {
             {data.meta.total} order{data.meta.total !== 1 ? "s" : ""}
           </p>
         </div>
-      )}
+      ) : null}
 
       {isLoading ? (
         <div className="space-y-2">

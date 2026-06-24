@@ -10,11 +10,12 @@ interface FilterPillsProps {
   active: string;
   onSelect: (value: string) => void;
   className?: string;
+  ariaLabel?: string;
 }
 
-export function FilterPills({ pills, active, onSelect, className }: FilterPillsProps) {
+export function FilterPills({ pills, active, onSelect, className, ariaLabel = "Filter options" }: FilterPillsProps) {
   return (
-    <div className={cn("flex flex-wrap gap-2", className)} role="group">
+    <div className={cn("flex flex-wrap gap-2", className)} role="group" aria-label={ariaLabel}>
       {pills.map((pill) => (
         <button
           key={pill.value}

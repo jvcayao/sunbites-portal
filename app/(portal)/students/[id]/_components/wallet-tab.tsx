@@ -175,8 +175,8 @@ export function WalletTab({ studentId }: WalletTabProps) {
 
       {/* Filters */}
       <div className="space-y-2">
-        <FilterPills pills={TYPE_PILLS} active={typeFilter} onSelect={handleTypeChange} />
-        <FilterPills pills={TIME_PILLS} active={timeFilter} onSelect={handleTimeChange} />
+        <FilterPills pills={TYPE_PILLS} active={typeFilter} onSelect={handleTypeChange} ariaLabel="Filter by type" />
+        <FilterPills pills={TIME_PILLS} active={timeFilter} onSelect={handleTimeChange} ariaLabel="Filter by time" />
       </div>
 
       {/* Transactions */}
