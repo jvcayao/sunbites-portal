@@ -19,8 +19,16 @@ export interface StudentSummary {
   id: number;
   student_number: string;
   full_name: string;
+  first_name: string;
+  last_name: string;
   grade_level: string;
+  section: string | null;
+  birthday: string | null;
+  notes: string | null;
+  qr_code: string | null;
+  photo_url: string | null;
   branch_name: string;
+  allergies: string | null;
   wallet_balance: number;
   wallet_alert_threshold: number;
   enrollment_status: "enrolled" | "paused" | "graduated" | "banned";
