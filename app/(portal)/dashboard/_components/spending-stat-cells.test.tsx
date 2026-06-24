@@ -28,7 +28,7 @@ describe("SpendingStatCells", () => {
     render(
       <SpendingStatCells
         data={{ ...base, this_month_total: 900, last_month_total: 1050 }}
-      />
+      />,
     );
     expect(screen.getByText(/↓/)).toBeInTheDocument();
   });

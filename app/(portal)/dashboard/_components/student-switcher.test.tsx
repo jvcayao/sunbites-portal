@@ -10,7 +10,11 @@ const students = [
 describe("StudentSwitcher", () => {
   it("renders one button per student using first name only", () => {
     render(
-      <StudentSwitcher students={students} activeIndex={0} onSelect={() => {}} />
+      <StudentSwitcher
+        students={students}
+        activeIndex={0}
+        onSelect={() => {}}
+      />,
     );
     expect(screen.getByRole("button", { name: /juan/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /maria/i })).toBeInTheDocument();
@@ -19,7 +23,11 @@ describe("StudentSwitcher", () => {
   it("calls onSelect with the correct index when clicked", async () => {
     const onSelect = jest.fn();
     render(
-      <StudentSwitcher students={students} activeIndex={0} onSelect={onSelect} />
+      <StudentSwitcher
+        students={students}
+        activeIndex={0}
+        onSelect={onSelect}
+      />,
     );
     await userEvent.click(screen.getByRole("button", { name: /maria/i }));
     expect(onSelect).toHaveBeenCalledWith(1);
@@ -27,7 +35,11 @@ describe("StudentSwitcher", () => {
 
   it("applies student color as background on the active button", () => {
     render(
-      <StudentSwitcher students={students} activeIndex={0} onSelect={() => {}} />
+      <StudentSwitcher
+        students={students}
+        activeIndex={0}
+        onSelect={() => {}}
+      />,
     );
     const activeBtn = screen.getByRole("button", { name: /juan/i });
     expect(activeBtn).toHaveStyle({ backgroundColor: STUDENT_COLORS[0] });
@@ -35,7 +47,11 @@ describe("StudentSwitcher", () => {
 
   it("does not apply background color to inactive buttons", () => {
     render(
-      <StudentSwitcher students={students} activeIndex={0} onSelect={() => {}} />
+      <StudentSwitcher
+        students={students}
+        activeIndex={0}
+        onSelect={() => {}}
+      />,
     );
     const inactiveBtn = screen.getByRole("button", { name: /maria/i });
     expect(inactiveBtn).not.toHaveStyle({ backgroundColor: STUDENT_COLORS[1] });

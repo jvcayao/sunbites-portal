@@ -15,7 +15,7 @@ export function SpendingStatCells({ data }: Props) {
       ? Math.round(
           (Math.abs(data.this_month_total - data.last_month_total) /
             data.last_month_total) *
-            100
+            100,
         )
       : null;
   const isUp = data.this_month_total > data.last_month_total;
@@ -39,7 +39,7 @@ export function SpendingStatCells({ data }: Props) {
                 ? "text-red-500"
                 : isDown
                   ? "text-emerald-500"
-                  : "text-muted-foreground"
+                  : "text-muted-foreground",
             )}
           >
             {isUp ? "↑" : isDown ? "↓" : ""} {delta}% vs last month

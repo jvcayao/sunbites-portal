@@ -93,7 +93,9 @@ export function StudentHeader({
         {/* Avatar with upload overlay */}
         <div className="relative shrink-0">
           <Avatar className="h-20 w-20">
-            {displayUrl && <AvatarImage src={displayUrl} alt={student.full_name} />}
+            {displayUrl && (
+              <AvatarImage src={displayUrl} alt={student.full_name} />
+            )}
             <AvatarFallback className="text-xl font-semibold">
               {getInitials(student.full_name)}
             </AvatarFallback>

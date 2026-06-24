@@ -7,7 +7,10 @@ interface Props {
 
 type MethodKey = keyof SpendingSummary["payment_method_split"];
 
-const METHOD_CONFIG: Record<MethodKey, { label: string; bg: (color: string) => string }> = {
+const METHOD_CONFIG: Record<
+  MethodKey,
+  { label: string; bg: (color: string) => string }
+> = {
   wallet: { label: "Wallet", bg: (c) => c },
   subscription: { label: "Plan", bg: () => "#34D399" },
   cash: { label: "Cash", bg: () => "#CBD5E1" },

@@ -98,7 +98,7 @@ export default function DashboardPage() {
       {/* Students */}
       <section aria-labelledby="students-heading">
         <h2 id="students-heading" className="mb-4 text-base font-semibold">
-          Your Students
+          Your Kids
         </h2>
 
         {isLoading ? (

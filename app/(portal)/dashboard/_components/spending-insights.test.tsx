@@ -9,7 +9,9 @@ jest.mock("recharts", () => ({
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
     <div>{children}</div>
   ),
-  BarChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  BarChart: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
   Bar: () => null,
   XAxis: () => null,
   YAxis: () => null,
@@ -80,7 +82,7 @@ describe("SpendingInsights", () => {
     render(<SpendingInsights students={students} />);
     // Payment history section heading only appears for subscription students
     expect(
-      await screen.findByText(/subscription payments/i)
+      await screen.findByText(/subscription payments/i),
     ).toBeInTheDocument();
   });
 
@@ -91,19 +93,19 @@ describe("SpendingInsights", () => {
     await userEvent.click(screen.getByRole("button", { name: /maria/i }));
     // After switching, subscription section should not appear
     expect(
-      screen.queryByText(/subscription payments/i)
+      screen.queryByText(/subscription payments/i),
     ).not.toBeInTheDocument();
   });
 
   it("shows error message when API fails", async () => {
     server.use(
       http.get("*/portal/students/:id/spending-summary", () =>
-        HttpResponse.json({ message: "Server error" }, { status: 500 })
-      )
+        HttpResponse.json({ message: "Server error" }, { status: 500 }),
+      ),
     );
     render(<SpendingInsights students={students} />);
     expect(
-      await screen.findByText(/failed to load spending data/i)
+      await screen.findByText(/failed to load spending data/i),
     ).toBeInTheDocument();
   });
 

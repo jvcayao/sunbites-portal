@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
-export const STUDENT_COLORS = ["#F97316", "#8B5CF6", "#0EA5E9", "#10B981"];
+export const STUDENT_COLORS = ["#E8694E", "#7C6FD4", "#0891B2", "#059669"];
 
 interface Props {
   students: Array<{ id: number; full_name: string }>;
@@ -26,7 +26,7 @@ export function StudentSwitcher({ students, activeIndex, onSelect }: Props) {
               "flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[12.5px] font-medium transition-all",
               isActive
                 ? "border-transparent text-white"
-                : "border-border text-muted-foreground hover:border-muted hover:bg-muted/30 hover:text-foreground"
+                : "border-border text-muted-foreground hover:border-muted hover:bg-muted/30 hover:text-foreground",
             )}
             style={isActive ? { backgroundColor: color } : undefined}
           >

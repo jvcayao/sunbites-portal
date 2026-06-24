@@ -55,7 +55,8 @@ export function PaymentHistoryTimeline({ student, color }: Props) {
   const currentEntry = recent.find((p) =>
     isCurrentSchoolMonth(p.school_month, p.year),
   );
-  const isOverdue = currentEntry !== undefined && currentEntry.status !== "paid";
+  const isOverdue =
+    currentEntry !== undefined && currentEntry.status !== "paid";
 
   return (
     <div className="border-t border-border px-6 py-4">
@@ -141,7 +142,9 @@ export function PaymentHistoryTimeline({ student, color }: Props) {
               <span
                 className={cn(
                   "text-center text-[10px]",
-                  isPaid ? "text-muted-foreground" : "font-semibold text-red-500",
+                  isPaid
+                    ? "text-muted-foreground"
+                    : "font-semibold text-red-500",
                 )}
               >
                 {isPaid
