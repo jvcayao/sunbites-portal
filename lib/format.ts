@@ -34,3 +34,17 @@ export function formatDateTime(dateString: string): string {
     minute: "2-digit",
   });
 }
+
+/**
+ * Format a YYYY-MM-DD date string as a human-readable birthday.
+ * Uses local date construction to avoid UTC midnight timezone offset issues.
+ * Example: formatBirthday("2011-05-15") → "May 15, 2011"
+ */
+export function formatBirthday(dateStr: string): string {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString("en-PH", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}

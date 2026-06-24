@@ -8,6 +8,7 @@ interface AuthState {
   parent: AuthParent | null;
   login: (token: string, parent: AuthParent) => void;
   logout: () => void;
+  updateParent: (parent: AuthParent) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -17,6 +18,7 @@ export const useAuthStore = create<AuthState>()(
       parent: null,
       login: (token, parent) => set({ token, parent }),
       logout: () => set({ token: null, parent: null }),
+      updateParent: (parent) => set({ parent }),
     }),
     {
       name: "portal-auth",

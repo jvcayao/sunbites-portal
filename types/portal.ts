@@ -19,8 +19,16 @@ export interface StudentSummary {
   id: number;
   student_number: string;
   full_name: string;
+  first_name: string;
+  last_name: string;
   grade_level: string;
+  section: string | null;
+  birthday: string | null;
+  notes: string | null;
+  qr_code: string | null;
+  photo_url: string | null;
   branch_name: string;
+  allergies: string | null;
   wallet_balance: number;
   wallet_alert_threshold: number;
   enrollment_status: "enrolled" | "paused" | "graduated" | "banned";
@@ -113,4 +121,33 @@ export interface FeedbackItem {
 export interface FeedbackResponse {
   data: FeedbackItem[];
   meta: PaginatedMeta;
+}
+
+export interface MonthlySpending {
+  month: string; // "2026-01"
+  label: string; // "Jan"
+  total: number;
+}
+
+export interface TopItem {
+  name: string;
+  count: number;
+}
+
+export interface SpendingSummary {
+  monthly: MonthlySpending[];
+  top_items: TopItem[];
+  payment_method_split: {
+    wallet: number;
+    cash: number;
+    subscription: number;
+    gcash: number;
+  };
+  ytd_total: number;
+  this_month_total: number;
+  last_month_total: number;
+}
+
+export interface PaymentHistoryResponse {
+  data: import("@/types/notification").PaymentHistoryEntry[];
 }

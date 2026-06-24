@@ -7,6 +7,7 @@ export interface AuthParent {
   address: string | null;
   profile_photo_url: string | null;
   created_at: string;
+  has_subscription_student: boolean;
 }
 
 export interface ApiError {
