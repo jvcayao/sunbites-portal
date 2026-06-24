@@ -39,6 +39,13 @@ export function PortalLayout({ children }: PortalLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const parent = useAuthStore((s) => s.parent);
+  const hasSubscriptionStudent = useAuthStore(
+    (s) => s.parent?.has_subscription_student ?? false,
+  );
+
+  const visibleNavLinks = navLinks.filter(
+    (link) => link.href !== "/meal-plan" || hasSubscriptionStudent,
+  );
 
   async function handleLogout() {
     try {
@@ -65,7 +72,7 @@ export function PortalLayout({ children }: PortalLayoutProps) {
             className="hidden items-center gap-1 md:flex"
             aria-label="Main navigation"
           >
-            {navLinks.map((link) => {
+            {visibleNavLinks.map((link) => {
               const isActive =
                 pathname === link.href || pathname.startsWith(`${link.href}/`);
               return (
@@ -156,7 +163,7 @@ export function PortalLayout({ children }: PortalLayoutProps) {
               className="mx-auto max-w-7xl space-y-1 px-4 py-3"
               aria-label="Mobile navigation"
             >
-              {navLinks.map((link) => {
+              {visibleNavLinks.map((link) => {
                 const isActive =
                   pathname === link.href ||
                   pathname.startsWith(`${link.href}/`);

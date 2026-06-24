@@ -12,6 +12,7 @@ const mockParent: AuthParent = {
   address: null,
   profile_photo_url: null,
   created_at: "2026-01-01T00:00:00.000000Z",
+  has_subscription_student: false,
 };
 
 beforeEach(() => {
@@ -36,6 +37,26 @@ describe("useAuthStore (portal)", () => {
 
     expect(result.current.token).toBe("test-token");
     expect(result.current.parent).toEqual(mockParent);
+  });
+
+  it("updateParent() replaces parent while keeping token", () => {
+    const { result } = renderHook(() => useAuthStore());
+
+    act(() => {
+      result.current.login("test-token", mockParent);
+    });
+
+    const updated: AuthParent = {
+      ...mockParent,
+      has_subscription_student: true,
+    };
+
+    act(() => {
+      result.current.updateParent(updated);
+    });
+
+    expect(result.current.token).toBe("test-token");
+    expect(result.current.parent?.has_subscription_student).toBe(true);
   });
 
   it("logout() clears all state", () => {

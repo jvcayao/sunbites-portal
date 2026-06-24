@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuthStore } from "@/lib/store/auth";
 import { mealPlanApi } from "@/lib/api/portal";
 import { cn } from "@/lib/utils";
 
@@ -141,13 +143,29 @@ export default function MealPlanPage() {
   const [activeMonth, setActiveMonth] = useState<string>("june");
   const [activeWeek, setActiveWeek] = useState<number>(1);
 
+  // Route guard — subscription access only.
+  const router = useRouter();
+  const hasSubscriptionStudent = useAuthStore(
+    (s) => s.parent?.has_subscription_student ?? false,
+  );
+
+  // All hooks must be declared before any conditional return.
   // TODO: If the API adds multi-branch support, add a branch selector above the
   // month tabs here. For now, the backend derives branch from the linked student.
-
   const { data, isLoading, error } = useQuery({
     queryKey: ["portal-meal-plan", activeMonth, activeWeek],
     queryFn: () => mealPlanApi.get(activeMonth, activeWeek),
+    enabled: hasSubscriptionStudent, // skip the query when access is denied
   });
+
+  useEffect(() => {
+    if (!hasSubscriptionStudent) {
+      router.replace("/dashboard");
+    }
+  }, [hasSubscriptionStudent, router]);
+
+  // Return null to prevent content flash while the redirect fires.
+  if (!hasSubscriptionStudent) return null;
 
   return (
     <div className="space-y-2">
