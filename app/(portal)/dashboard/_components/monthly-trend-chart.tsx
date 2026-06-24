@@ -73,13 +73,13 @@ export function MonthlyTrendChart({ data, color }: Props) {
             y,
             payload,
           }: {
-            x: number;
-            y: number;
+            x: string | number;
+            y: string | number;
             payload: { value: string };
           }) => (
             <text
               x={x}
-              y={y + 12}
+              y={Number(y) + 12}
               textAnchor="middle"
               fill={payload.value === lastLabel ? color : "#9CA3AF"}
               fontSize={payload.value === lastLabel ? 11 : 10}

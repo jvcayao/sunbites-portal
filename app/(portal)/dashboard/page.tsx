@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { dashboardApi } from "@/lib/api/portal";
 import { formatPHP } from "@/lib/format";
 
+import { SpendingInsights } from "./_components/spending-insights";
+
 import type { StudentSummary } from "@/types/portal";
 
 function StudentCardSkeleton() {
@@ -122,6 +124,10 @@ export default function DashboardPage() {
           </div>
         )}
       </section>
+
+      {data?.students && data.students.length > 0 && (
+        <SpendingInsights students={data.students} />
+      )}
     </div>
   );
 }
