@@ -46,7 +46,10 @@ describe("useAuthStore (portal)", () => {
       result.current.login("test-token", mockParent);
     });
 
-    const updated: AuthParent = { ...mockParent, has_subscription_student: true };
+    const updated: AuthParent = {
+      ...mockParent,
+      has_subscription_student: true,
+    };
 
     act(() => {
       result.current.updateParent(updated);

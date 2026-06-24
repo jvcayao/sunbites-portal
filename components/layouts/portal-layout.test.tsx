@@ -48,21 +48,35 @@ describe("PortalLayout — Meal Plan nav visibility", () => {
   });
 
   it("hides the Meal Plan link when has_subscription_student is false", () => {
-    render(<PortalLayout><div>page</div></PortalLayout>);
+    render(
+      <PortalLayout>
+        <div>page</div>
+      </PortalLayout>,
+    );
 
-    expect(screen.queryByRole("link", { name: "Meal Plan" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Meal Plan" }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows the Meal Plan link when has_subscription_student is true", () => {
     mockAuthState.parent.has_subscription_student = true;
 
-    render(<PortalLayout><div>page</div></PortalLayout>);
+    render(
+      <PortalLayout>
+        <div>page</div>
+      </PortalLayout>,
+    );
 
     expect(screen.getByRole("link", { name: "Meal Plan" })).toBeInTheDocument();
   });
 
   it("always shows Dashboard, Students, and Feedback links regardless of subscription", () => {
-    render(<PortalLayout><div>page</div></PortalLayout>);
+    render(
+      <PortalLayout>
+        <div>page</div>
+      </PortalLayout>,
+    );
 
     expect(screen.getByRole("link", { name: "Dashboard" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Students" })).toBeInTheDocument();

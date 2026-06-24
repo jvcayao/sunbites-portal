@@ -39,7 +39,9 @@ export function PortalLayout({ children }: PortalLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const parent = useAuthStore((s) => s.parent);
-  const hasSubscriptionStudent = useAuthStore((s) => s.parent?.has_subscription_student ?? false);
+  const hasSubscriptionStudent = useAuthStore(
+    (s) => s.parent?.has_subscription_student ?? false,
+  );
 
   const visibleNavLinks = navLinks.filter(
     (link) => link.href !== "/meal-plan" || hasSubscriptionStudent,

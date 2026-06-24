@@ -465,7 +465,9 @@ export default function StudentDetailPage() {
   useEffect(() => {
     const students = studentsData?.data;
     if (!students || !parent) return;
-    const hasSubscription = students.some((s) => s.student_type === "subscription");
+    const hasSubscription = students.some(
+      (s) => s.student_type === "subscription",
+    );
     if (parent.has_subscription_student !== hasSubscription) {
       updateParent({ ...parent, has_subscription_student: hasSubscription });
     }
