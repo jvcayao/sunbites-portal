@@ -7,6 +7,7 @@ import type {
   FeedbackItem,
   FeedbackResponse,
   MealPlanResponse,
+  SpendingSummary,
   StudentDetail,
   WalletData,
 } from "@/types/portal";
@@ -154,6 +155,11 @@ export const studentsApi = {
     apiClient.get<{ data: PaymentHistoryEntry[] }>(
       `/portal/students/${id}/payment-history`,
     ),
+
+  spendingSummary: (id: number, params?: { months?: number }) =>
+    apiClient.get<SpendingSummary>(`/portal/students/${id}/spending-summary`, {
+      params,
+    }),
 };
 
 // --- Meal Plan ---
