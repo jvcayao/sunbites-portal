@@ -35,4 +35,25 @@ export const handlers = [
       ],
     }),
   ),
+
+  http.get(`${API}/portal/students/:id/spending-summary`, () =>
+    HttpResponse.json({
+      monthly: [
+        { month: "2026-01", label: "Jan", total: 850 },
+        { month: "2026-02", label: "Feb", total: 920 },
+        { month: "2026-03", label: "Mar", total: 780 },
+        { month: "2026-04", label: "Apr", total: 1100 },
+        { month: "2026-05", label: "May", total: 1050 },
+        { month: "2026-06", label: "Jun", total: 1250 },
+      ],
+      top_items: [
+        { name: "Spaghetti", count: 18 },
+        { name: "Rice w/ Chicken", count: 14 },
+      ],
+      payment_method_split: { wallet: 65, cash: 35, subscription: 0, gcash: 0 },
+      ytd_total: 5950,
+      this_month_total: 1250,
+      last_month_total: 1050,
+    }),
+  ),
 ];
