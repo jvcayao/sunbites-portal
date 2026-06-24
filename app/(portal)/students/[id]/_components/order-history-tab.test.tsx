@@ -23,7 +23,9 @@ const mockActivity = {
 describe("OrderHistoryTab", () => {
   beforeEach(() => {
     server.use(
-      http.get(`${API}/portal/students/1/activity`, () => HttpResponse.json(mockActivity)),
+      http.get(`${API}/portal/students/1/activity`, () =>
+        HttpResponse.json(mockActivity),
+      ),
     );
   });
 
@@ -75,7 +77,11 @@ describe("OrderHistoryTab", () => {
   it("shows empty state when no orders match", async () => {
     server.use(
       http.get(`${API}/portal/students/1/activity`, () =>
-        HttpResponse.json({ ...mockActivity, data: [], meta: { ...mockActivity.meta, total: 0 } }),
+        HttpResponse.json({
+          ...mockActivity,
+          data: [],
+          meta: { ...mockActivity.meta, total: 0 },
+        }),
       ),
     );
 

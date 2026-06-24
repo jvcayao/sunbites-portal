@@ -37,7 +37,9 @@ function TransactionRow({ tx }: { tx: Transaction }) {
   const isCredit = tx.amount >= 0;
   return (
     <tr className="border-b border-border last:border-0">
-      <td className="px-4 py-3 text-sm text-muted-foreground">{formatDate(tx.created_at)}</td>
+      <td className="px-4 py-3 text-sm text-muted-foreground">
+        {formatDate(tx.created_at)}
+      </td>
       <td className="px-4 py-3 text-sm capitalize">{tx.type}</td>
       <td
         className={cn(
@@ -60,8 +62,12 @@ export function WalletTab({ studentId }: WalletTabProps) {
   const [timeFilter, setTimeFilter] = useState("all");
   const [page, setPage] = useState(1);
 
-  const typeParam = typeFilter === "all" ? undefined : (typeFilter as "deposit" | "withdraw");
-  const dateRange = timeFilter === "all" ? undefined : getDateRange(timeFilter as DateRangeFilter);
+  const typeParam =
+    typeFilter === "all" ? undefined : (typeFilter as "deposit" | "withdraw");
+  const dateRange =
+    timeFilter === "all"
+      ? undefined
+      : getDateRange(timeFilter as DateRangeFilter);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["student-wallet", studentId, typeFilter, timeFilter, page],
@@ -81,11 +87,14 @@ export function WalletTab({ studentId }: WalletTabProps) {
   }, [data, alertEditing]);
 
   const alertMutation = useMutation({
-    mutationFn: (threshold: number) => studentsApi.setAlert(studentId, threshold),
+    mutationFn: (threshold: number) =>
+      studentsApi.setAlert(studentId, threshold),
     onSuccess: () => {
       toast.success("Wallet alert threshold updated.");
       setAlertEditing(false);
-      queryClient.invalidateQueries({ queryKey: ["student-wallet", studentId] });
+      queryClient.invalidateQueries({
+        queryKey: ["student-wallet", studentId],
+      });
     },
     onError: (err: ApiError) => {
       toast.error(err.message ?? "Failed to update threshold.");
@@ -157,7 +166,11 @@ export function WalletTab({ studentId }: WalletTabProps) {
                 className="w-28"
                 aria-label="Alert threshold amount"
               />
-              <Button size="sm" onClick={handleSaveAlert} disabled={alertMutation.isPending}>
+              <Button
+                size="sm"
+                onClick={handleSaveAlert}
+                disabled={alertMutation.isPending}
+              >
                 {alertMutation.isPending ? "Saving…" : "Save"}
               </Button>
               <Button
@@ -175,8 +188,18 @@ export function WalletTab({ studentId }: WalletTabProps) {
 
       {/* Filters */}
       <div className="space-y-2">
-        <FilterPills pills={TYPE_PILLS} active={typeFilter} onSelect={handleTypeChange} ariaLabel="Filter by type" />
-        <FilterPills pills={TIME_PILLS} active={timeFilter} onSelect={handleTimeChange} ariaLabel="Filter by time" />
+        <FilterPills
+          pills={TYPE_PILLS}
+          active={typeFilter}
+          onSelect={handleTypeChange}
+          ariaLabel="Filter by type"
+        />
+        <FilterPills
+          pills={TIME_PILLS}
+          active={timeFilter}
+          onSelect={handleTimeChange}
+          ariaLabel="Filter by time"
+        />
       </div>
 
       {/* Transactions */}
@@ -187,10 +210,14 @@ export function WalletTab({ studentId }: WalletTabProps) {
           <Skeleton className="h-10 w-full" />
         </div>
       ) : error ? (
-        <p className="text-sm text-destructive">Failed to load transactions. Please try again.</p>
+        <p className="text-sm text-destructive">
+          Failed to load transactions. Please try again.
+        </p>
       ) : !data?.data.length ? (
         <div className="rounded-xl border border-dashed border-border p-8 text-center">
-          <p className="text-sm text-muted-foreground">No transactions match the selected filters.</p>
+          <p className="text-sm text-muted-foreground">
+            No transactions match the selected filters.
+          </p>
         </div>
       ) : (
         <>
@@ -198,9 +225,15 @@ export function WalletTab({ studentId }: WalletTabProps) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted/50">
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Date</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Type</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Amount</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                    Date
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                    Type
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">
+                    Amount
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-card">
@@ -211,7 +244,8 @@ export function WalletTab({ studentId }: WalletTabProps) {
             </table>
           </div>
 
-          {(data.meta.current_page > 1 || data.meta.current_page < data.meta.last_page) && (
+          {(data.meta.current_page > 1 ||
+            data.meta.current_page < data.meta.last_page) && (
             <div className="flex items-center justify-between">
               <Button
                 variant="outline"

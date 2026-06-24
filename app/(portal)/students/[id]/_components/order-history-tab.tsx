@@ -37,13 +37,21 @@ interface OrderHistoryTabProps {
 }
 
 function OrderRow({ item }: { item: ActivityItem }) {
-  const itemNames = item.items.map((i) => `${i.name} x${i.quantity}`).join(", ");
+  const itemNames = item.items
+    .map((i) => `${i.name} x${i.quantity}`)
+    .join(", ");
   return (
     <tr className="border-b border-border last:border-0">
-      <td className="px-4 py-3 text-sm text-muted-foreground">{formatDate(item.created_at)}</td>
+      <td className="px-4 py-3 text-sm text-muted-foreground">
+        {formatDate(item.created_at)}
+      </td>
       <td className="px-4 py-3 text-sm">{itemNames}</td>
-      <td className="px-4 py-3 text-sm">{PAYMENT_METHOD_LABELS[item.payment_method] ?? item.payment_method}</td>
-      <td className="px-4 py-3 text-right text-sm font-semibold tabular-nums">{formatPHP(item.total)}</td>
+      <td className="px-4 py-3 text-sm">
+        {PAYMENT_METHOD_LABELS[item.payment_method] ?? item.payment_method}
+      </td>
+      <td className="px-4 py-3 text-right text-sm font-semibold tabular-nums">
+        {formatPHP(item.total)}
+      </td>
     </tr>
   );
 }
@@ -54,8 +62,12 @@ export function OrderHistoryTab({ studentId }: OrderHistoryTabProps) {
   const [page, setPage] = useState(1);
   const perPage = 15;
 
-  const methodParam = methodFilter === "all" ? undefined : (methodFilter as "cash" | "wallet");
-  const dateRange = timeFilter === "all" ? undefined : getDateRange(timeFilter as DateRangeFilter);
+  const methodParam =
+    methodFilter === "all" ? undefined : (methodFilter as "cash" | "wallet");
+  const dateRange =
+    timeFilter === "all"
+      ? undefined
+      : getDateRange(timeFilter as DateRangeFilter);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["student-activity", studentId, methodFilter, timeFilter, page],
@@ -83,8 +95,18 @@ export function OrderHistoryTab({ studentId }: OrderHistoryTabProps) {
     <div className="space-y-4">
       {/* Filters */}
       <div className="space-y-2">
-        <FilterPills pills={METHOD_PILLS} active={methodFilter} onSelect={handleMethodChange} ariaLabel="Filter by payment method" />
-        <FilterPills pills={TIME_PILLS} active={timeFilter} onSelect={handleTimeChange} ariaLabel="Filter by time" />
+        <FilterPills
+          pills={METHOD_PILLS}
+          active={methodFilter}
+          onSelect={handleMethodChange}
+          ariaLabel="Filter by payment method"
+        />
+        <FilterPills
+          pills={TIME_PILLS}
+          active={timeFilter}
+          onSelect={handleTimeChange}
+          ariaLabel="Filter by time"
+        />
       </div>
 
       {/* Summary */}
@@ -111,10 +133,14 @@ export function OrderHistoryTab({ studentId }: OrderHistoryTabProps) {
           <Skeleton className="h-10 w-full" />
         </div>
       ) : error ? (
-        <p className="text-sm text-destructive">Failed to load order history. Please try again.</p>
+        <p className="text-sm text-destructive">
+          Failed to load order history. Please try again.
+        </p>
       ) : !data?.data.length ? (
         <div className="rounded-xl border border-dashed border-border p-10 text-center">
-          <p className="text-sm text-muted-foreground">No orders match the selected filters.</p>
+          <p className="text-sm text-muted-foreground">
+            No orders match the selected filters.
+          </p>
         </div>
       ) : (
         <>
@@ -122,10 +148,18 @@ export function OrderHistoryTab({ studentId }: OrderHistoryTabProps) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted/50">
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Date</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Items</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Method</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Total</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                    Date
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                    Items
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                    Method
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">
+                    Total
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-card">
@@ -136,7 +170,8 @@ export function OrderHistoryTab({ studentId }: OrderHistoryTabProps) {
             </table>
           </div>
 
-          {(data.meta.current_page > 1 || data.meta.current_page < data.meta.last_page) && (
+          {(data.meta.current_page > 1 ||
+            data.meta.current_page < data.meta.last_page) && (
             <div className="flex items-center justify-between">
               <Button
                 variant="outline"

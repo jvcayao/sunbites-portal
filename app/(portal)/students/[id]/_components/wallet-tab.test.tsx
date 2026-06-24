@@ -10,7 +10,13 @@ const mockWallet = {
   balance: 500,
   wallet_alert_threshold: 50,
   data: [
-    { id: 1, type: "deposit", amount: 500, meta: null, created_at: "2026-06-01T10:00:00Z" },
+    {
+      id: 1,
+      type: "deposit",
+      amount: 500,
+      meta: null,
+      created_at: "2026-06-01T10:00:00Z",
+    },
   ],
   meta: { current_page: 1, last_page: 1, per_page: 20, total: 1 },
 };
@@ -18,7 +24,9 @@ const mockWallet = {
 describe("WalletTab", () => {
   beforeEach(() => {
     server.use(
-      http.get(`${API}/portal/students/1/wallet`, () => HttpResponse.json(mockWallet)),
+      http.get(`${API}/portal/students/1/wallet`, () =>
+        HttpResponse.json(mockWallet),
+      ),
     );
   });
 

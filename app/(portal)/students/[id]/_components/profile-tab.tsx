@@ -7,10 +7,20 @@ interface ProfileTabProps {
   student: StudentSummary;
 }
 
-function InfoField({ label, value, className }: { label: string; value: React.ReactNode; className?: string }) {
+function InfoField({
+  label,
+  value,
+  className,
+}: {
+  label: string;
+  value: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div className={cn("border-b border-border py-3 last:border-0", className)}>
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{label}</p>
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        {label}
+      </p>
       <div className="mt-1 text-sm">{value}</div>
     </div>
   );
@@ -48,7 +58,10 @@ export function ProfileTab({ student }: ProfileTabProps) {
           </div>
           {/* Right column */}
           <div>
-            <InfoField label="Student Number" value={student.student_number || "—"} />
+            <InfoField
+              label="Student Number"
+              value={student.student_number || "—"}
+            />
             <InfoField
               label="Student Type"
               value={isSubscription ? "Subscription" : "Non-Subscription"}
@@ -78,10 +91,15 @@ export function ProfileTab({ student }: ProfileTabProps) {
                   key={cat}
                   className="rounded-lg border border-border bg-muted/30 p-3 text-center"
                 >
-                  <p className="text-xs font-medium text-muted-foreground capitalize mb-1">{cat}</p>
+                  <p className="text-xs font-medium text-muted-foreground capitalize mb-1">
+                    {cat}
+                  </p>
                   <p className="text-lg font-bold tabular-nums">
                     {s.used}
-                    <span className="text-sm font-normal text-muted-foreground"> / {s.allocated}</span>
+                    <span className="text-sm font-normal text-muted-foreground">
+                      {" "}
+                      / {s.allocated}
+                    </span>
                   </p>
                   <p
                     className={cn(

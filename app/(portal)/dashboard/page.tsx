@@ -78,7 +78,6 @@ function StudentCard({ student }: { student: StudentSummary }) {
   );
 }
 
-
 export default function DashboardPage() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["dashboard"],
@@ -123,7 +122,6 @@ export default function DashboardPage() {
           </div>
         )}
       </section>
-
     </div>
   );
 }

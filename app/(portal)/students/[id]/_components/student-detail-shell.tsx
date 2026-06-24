@@ -64,7 +64,9 @@ export function StudentDetailShell({ studentId }: StudentDetailShellProps) {
   useEffect(() => {
     const students = studentsData?.data;
     if (!students || !parent) return;
-    const hasSubscription = students.some((s) => s.student_type === "subscription");
+    const hasSubscription = students.some(
+      (s) => s.student_type === "subscription",
+    );
     if (parent.has_subscription_student !== hasSubscription) {
       updateParent({ ...parent, has_subscription_student: hasSubscription });
     }
@@ -96,7 +98,10 @@ export function StudentDetailShell({ studentId }: StudentDetailShellProps) {
       {isLoading ? (
         <HeaderSkeleton />
       ) : student ? (
-        <StudentHeader student={student} onPhotoUploaded={handlePhotoUploaded} />
+        <StudentHeader
+          student={student}
+          onPhotoUploaded={handlePhotoUploaded}
+        />
       ) : (
         <p className="text-sm text-muted-foreground">Student not found.</p>
       )}
@@ -128,8 +133,12 @@ export function StudentDetailShell({ studentId }: StudentDetailShellProps) {
           {/* Tab content */}
           {activeTab === "profile" && <ProfileTab student={student} />}
           {activeTab === "wallet" && <WalletTab studentId={studentId} />}
-          {activeTab === "order-history" && <OrderHistoryTab studentId={studentId} />}
-          {activeTab === "payment" && isSubscription && <PaymentHistoryTab studentId={studentId} />}
+          {activeTab === "order-history" && (
+            <OrderHistoryTab studentId={studentId} />
+          )}
+          {activeTab === "payment" && isSubscription && (
+            <PaymentHistoryTab studentId={studentId} />
+          )}
         </>
       )}
     </div>

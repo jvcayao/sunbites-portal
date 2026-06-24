@@ -81,7 +81,10 @@ export const studentsApi = {
     return URL.createObjectURL(blob);
   },
 
-  uploadPhoto: async (id: number, file: File): Promise<{ photo_url: string }> => {
+  uploadPhoto: async (
+    id: number,
+    file: File,
+  ): Promise<{ photo_url: string }> => {
     const { useAuthStore } = await import("@/lib/store/auth");
     const token = useAuthStore.getState().token;
     const formData = new FormData();
@@ -89,9 +92,15 @@ export const studentsApi = {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/portal/students/${id}/photo`;
     const headers: Record<string, string> = { Accept: "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
-    const response = await fetch(url, { method: "POST", headers, body: formData });
+    const response = await fetch(url, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
     if (!response.ok) {
-      const err = await response.json().catch(() => ({ message: "Upload failed." }));
+      const err = await response
+        .json()
+        .catch(() => ({ message: "Upload failed." }));
       throw err;
     }
     return response.json();

@@ -7,7 +7,10 @@ function toISODate(date: Date): string {
 
 export type DateRangeFilter = "today" | "this-week" | "this-month";
 
-export function getDateRange(filter: DateRangeFilter): { from: string; to: string } {
+export function getDateRange(filter: DateRangeFilter): {
+  from: string;
+  to: string;
+} {
   const today = new Date();
 
   if (filter === "today") {

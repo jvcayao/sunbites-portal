@@ -13,9 +13,19 @@ interface FilterPillsProps {
   ariaLabel?: string;
 }
 
-export function FilterPills({ pills, active, onSelect, className, ariaLabel = "Filter options" }: FilterPillsProps) {
+export function FilterPills({
+  pills,
+  active,
+  onSelect,
+  className,
+  ariaLabel = "Filter options",
+}: FilterPillsProps) {
   return (
-    <div className={cn("flex flex-wrap gap-2", className)} role="group" aria-label={ariaLabel}>
+    <div
+      className={cn("flex flex-wrap gap-2", className)}
+      role="group"
+      aria-label={ariaLabel}
+    >
       {pills.map((pill) => (
         <button
           key={pill.value}

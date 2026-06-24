@@ -8,7 +8,6 @@ import { EnrollmentStatusBadge } from "@/components/enrollment-status-badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { studentsApi } from "@/lib/api/portal";
-import { formatPHP } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 import { StudentQrActions } from "./student-qr-actions";
@@ -140,30 +139,14 @@ export function StudentHeader({
           </div>
         </div>
 
-        {/* Right: wallet + QR boxes + actions */}
-        <div className="flex flex-wrap items-start gap-3 shrink-0">
-          <div className="rounded-lg border border-border bg-muted/30 px-4 py-2 min-w-[90px]">
-            <p className="text-xs text-muted-foreground">Wallet</p>
-            <p className="mt-0.5 text-sm font-semibold tabular-nums">
-              {formatPHP(student.wallet_balance)}
-            </p>
-          </div>
-
-          {student.qr_code && (
-            <div className="rounded-lg border border-border bg-muted/30 px-4 py-2">
-              <p className="text-xs text-muted-foreground">QR ID</p>
-              <p className="mt-0.5 text-sm font-mono">{student.qr_code}</p>
-            </div>
-          )}
-
-          {student.qr_code && (
-            <StudentQrActions
-              qrCode={student.qr_code}
-              studentName={student.full_name}
-              className="self-end"
-            />
-          )}
-        </div>
+        {/* Right: QR actions */}
+        {student.qr_code && (
+          <StudentQrActions
+            student={student}
+            blobUrl={displayUrl}
+            className="self-end"
+          />
+        )}
       </div>
     </div>
   );
