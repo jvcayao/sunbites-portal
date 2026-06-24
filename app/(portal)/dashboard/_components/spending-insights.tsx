@@ -18,17 +18,18 @@ interface Props {
 export function SpendingInsights({ students }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  if (!students.length) {
-    return null;
-  }
-
   const activeStudent = students[activeIndex];
   const color = STUDENT_COLORS[activeIndex] ?? "#6B7280";
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["spending-summary", activeStudent.id],
-    queryFn: () => studentsApi.spendingSummary(activeStudent.id),
+    queryKey: ["spending-summary", activeStudent?.id],
+    queryFn: () => studentsApi.spendingSummary(activeStudent!.id),
+    enabled: students.length > 0,
   });
+
+  if (!students.length) {
+    return null;
+  }
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card">
@@ -94,7 +95,10 @@ export function SpendingInsights({ students }: Props) {
               Method
             </p>
             <div className="flex-1">
-              <PaymentMethodSplit split={data.payment_method_split} color={color} />
+              <PaymentMethodSplit
+                split={data.payment_method_split}
+                color={color}
+              />
             </div>
           </div>
 

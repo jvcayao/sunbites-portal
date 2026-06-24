@@ -12,8 +12,6 @@ import { Label } from "@/components/ui/label";
 import { portalAuthApi } from "@/lib/api/portal";
 import { cn } from "@/lib/utils";
 
-import type { ApiError } from "@/types/auth";
-
 const schema = z.object({
   email: z.string().email("Enter a valid email address"),
 });
