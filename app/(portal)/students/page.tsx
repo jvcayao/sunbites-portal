@@ -1,8 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight } from "lucide-react";
+
+import { useAuthStore } from "@/lib/store/auth";
 
 import { EnrollmentStatusBadge } from "@/components/enrollment-status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -71,6 +74,19 @@ export default function StudentsPage() {
     queryKey: ["students"],
     queryFn: studentsApi.list,
   });
+
+  // Keep has_subscription_student flag accurate after staff enrollment changes.
+  const updateParent = useAuthStore((s) => s.updateParent);
+  const parent = useAuthStore((s) => s.parent);
+
+  useEffect(() => {
+    const students = data?.data;
+    if (!students || !parent) return;
+    const hasSubscription = students.some((s) => s.student_type === "subscription");
+    if (parent.has_subscription_student !== hasSubscription) {
+      updateParent({ ...parent, has_subscription_student: hasSubscription });
+    }
+  }, [data, parent, updateParent]);
 
   return (
     <div className="space-y-6">

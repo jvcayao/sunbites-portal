@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { feedbackApi, studentsApi } from "@/lib/api/portal";
 import { formatDate } from "@/lib/format";
+import { useAuthStore } from "@/lib/store/auth";
 import { cn } from "@/lib/utils";
 
 import type { ApiError } from "@/types/auth";
@@ -121,6 +122,19 @@ function FeedbackForm() {
     queryKey: ["students"],
     queryFn: studentsApi.list,
   });
+
+  // Keep has_subscription_student flag accurate after staff enrollment changes.
+  const updateParent = useAuthStore((s) => s.updateParent);
+  const parent = useAuthStore((s) => s.parent);
+
+  useEffect(() => {
+    const students = studentsData?.data;
+    if (!students || !parent) return;
+    const hasSubscription = students.some((s) => s.student_type === "subscription");
+    if (parent.has_subscription_student !== hasSubscription) {
+      updateParent({ ...parent, has_subscription_student: hasSubscription });
+    }
+  }, [studentsData, parent, updateParent]);
 
   const [values, setValues] = useState<Partial<FeedbackFormData>>({
     student_id: undefined,

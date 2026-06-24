@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { studentsApi } from "@/lib/api/portal";
 import { formatDate, formatPHP } from "@/lib/format";
+import { useAuthStore } from "@/lib/store/auth";
 import { cn } from "@/lib/utils";
 
 import type { ApiError } from "@/types/auth";
@@ -456,6 +457,19 @@ export default function StudentDetailPage() {
     queryKey: ["students"],
     queryFn: studentsApi.list,
   });
+
+  // Keep has_subscription_student flag accurate after staff enrollment changes.
+  const updateParent = useAuthStore((s) => s.updateParent);
+  const parent = useAuthStore((s) => s.parent);
+
+  useEffect(() => {
+    const students = studentsData?.data;
+    if (!students || !parent) return;
+    const hasSubscription = students.some((s) => s.student_type === "subscription");
+    if (parent.has_subscription_student !== hasSubscription) {
+      updateParent({ ...parent, has_subscription_student: hasSubscription });
+    }
+  }, [studentsData, parent, updateParent]);
 
   const student = studentsData?.data.find((s) => s.id === studentId);
   const isSubscription = student?.student_type === "subscription";
