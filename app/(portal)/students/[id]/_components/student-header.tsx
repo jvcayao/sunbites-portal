@@ -35,17 +35,26 @@ export function StudentHeader({ student, onPhotoUploaded, className }: StudentHe
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    let url: string | null = null;
-
-    if (student.photo_url) {
-      studentsApi.fetchPhoto(student.id).then((fetched) => {
-        url = fetched;
-        setBlobUrl(fetched);
-      });
+    if (!student.photo_url) {
+      setBlobUrl(null);
+      return;
     }
 
+    let aborted = false;
+    let fetchedUrl: string | null = null;
+
+    studentsApi.fetchPhoto(student.id).then((fetched) => {
+      if (aborted) {
+        if (fetched) URL.revokeObjectURL(fetched);
+        return;
+      }
+      fetchedUrl = fetched;
+      setBlobUrl(fetched);
+    });
+
     return () => {
-      if (url) URL.revokeObjectURL(url);
+      aborted = true;
+      if (fetchedUrl) URL.revokeObjectURL(fetchedUrl);
     };
   }, [student.id, student.photo_url]);
 
@@ -89,7 +98,7 @@ export function StudentHeader({ student, onPhotoUploaded, className }: StudentHe
             disabled={uploading}
             aria-label="Upload student photo"
             onClick={() => fileInputRef.current?.click()}
-            className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-60"
+            className="absolute -bottom-1 -right-1 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 disabled:opacity-60"
           >
             <Camera className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
@@ -98,7 +107,6 @@ export function StudentHeader({ student, onPhotoUploaded, className }: StudentHe
             type="file"
             accept="image/jpeg,image/png,image/webp"
             className="sr-only"
-            aria-hidden="true"
             onChange={handleFileChange}
           />
         </div>
