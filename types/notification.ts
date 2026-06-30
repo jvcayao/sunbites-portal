@@ -46,6 +46,6 @@ export interface PaymentHistoryEntry {
   school_month: string;
   year: number;
   amount: number;
-  status: "paid" | "unpaid";
+  status: "paid" | "unpaid" | "voided";
   paid_at: string | null;
 }
