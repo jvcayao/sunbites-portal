@@ -48,7 +48,7 @@ export function PaymentHistoryTimeline({ student, color }: Props) {
     );
   }
 
-  const entries = data?.data ?? [];
+  const entries = (data?.data ?? []).filter((p) => p.status !== "voided");
   if (!entries.length) return null;
 
   const recent = entries.slice(-5);
