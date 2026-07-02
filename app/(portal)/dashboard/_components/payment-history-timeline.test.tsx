@@ -25,14 +25,22 @@ describe("PaymentHistoryTimeline", () => {
   });
 
   it("shows Overdue badge when current month is unpaid", async () => {
+    // Seed the ACTUAL current month (computed the same way the component's
+    // isCurrentSchoolMonth does) so this test is deterministic year-round and
+    // does not break once the calendar moves past a hardcoded month.
+    const now = new Date();
+    const currentMonth = now
+      .toLocaleString("en-US", { month: "long" })
+      .toLowerCase();
+
     server.use(
       http.get(`${API}/portal/students/:id/payment-history`, () =>
         HttpResponse.json({
           data: [
             {
               id: 1,
-              school_month: "june",
-              year: new Date().getFullYear(),
+              school_month: currentMonth,
+              year: now.getFullYear(),
               amount: 2500,
               status: "unpaid",
               paid_at: null,
