@@ -30,6 +30,8 @@ export interface StudentSummary {
   branch_name: string;
   allergies: string | null;
   wallet_balance: number;
+  /** Canteen credit still owed. Zero for the vast majority of students. Spec 14. */
+  credit_balance: number;
   wallet_alert_threshold: number;
   enrollment_status: "enrolled" | "paused" | "graduated" | "banned";
   student_type: "subscription" | "non_subscription";
@@ -87,6 +89,8 @@ export interface Transaction {
 
 export interface WalletData {
   balance: number;
+  /** Canteen credit still owed. Settled at the counter, never online. Spec 14. */
+  credit_balance: number;
   wallet_alert_threshold: number;
   data: Transaction[];
   meta: PaginatedMeta;

@@ -61,21 +61,75 @@ const TYPE_CONFIG: Record<
     label: "Payment",
     Icon: CreditCard,
   },
+  "App\\Notifications\\CreditChargedNotification": {
+    borderColor: "border-l-destructive",
+    iconBg: "bg-amber-100",
+    iconColor: "text-amber-600",
+    badgeBg: "bg-amber-100",
+    badgeText: "text-amber-700",
+    badgeBorder: "border-amber-300",
+    label: "Credit",
+    Icon: CreditCard,
+  },
+  "App\\Notifications\\CreditSettledNotification": {
+    borderColor: "border-l-primary",
+    iconBg: "bg-green-100",
+    iconColor: "text-green-600",
+    badgeBg: "bg-green-100",
+    badgeText: "text-green-700",
+    badgeBorder: "border-green-300",
+    label: "Credit",
+    Icon: CreditCard,
+  },
 };
 
-function getTitle(notification: ParentNotification): string {
-  if (notification.type === "App\\Notifications\\AnnouncementNotification") {
-    return notification.data.title ?? "Announcement";
+export function getNotificationTitle(notification: ParentNotification): string {
+  switch (notification.type) {
+    case "App\\Notifications\\AnnouncementNotification":
+      return notification.data.title ?? "Announcement";
+    case "App\\Notifications\\CreditChargedNotification":
+      return "Canteen Credit Used";
+    case "App\\Notifications\\CreditSettledNotification":
+      return notification.data.was_waived
+        ? "Credit Waived"
+        : "Credit Payment Received";
+    default:
+      return "Payment Reminder";
   }
-  return "Payment Reminder";
 }
 
-function getPreview(notification: ParentNotification): string {
-  if (notification.type === "App\\Notifications\\AnnouncementNotification") {
-    return notification.data.message;
+function peso(amount: number): string {
+  return `₱${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+export function getNotificationPreview(
+  notification: ParentNotification,
+): string {
+  switch (notification.type) {
+    case "App\\Notifications\\AnnouncementNotification":
+      return notification.data.message;
+
+    case "App\\Notifications\\CreditChargedNotification": {
+      const { student_name, amount, outstanding_balance } = notification.data;
+
+      return `${student_name} used ${peso(amount)} credit. Outstanding: ${peso(outstanding_balance)}.`;
+    }
+
+    case "App\\Notifications\\CreditSettledNotification": {
+      const { student_name, amount, outstanding_balance, was_waived } =
+        notification.data;
+
+      return was_waived
+        ? `${peso(amount)} of ${student_name}'s credit was waived. Outstanding: ${peso(outstanding_balance)}.`
+        : `${peso(amount)} credit payment received for ${student_name}. Outstanding: ${peso(outstanding_balance)}.`;
+    }
+
+    default: {
+      const { school_month, school_year, total_amount } = notification.data;
+
+      return `${school_month} ${school_year} — ₱${total_amount.toLocaleString()} due`;
+    }
   }
-  const { school_month, school_year, total_amount } = notification.data;
-  return `${school_month} ${school_year} — ₱${total_amount.toLocaleString()} due`;
 }
 
 export function NotificationItem({
@@ -94,8 +148,8 @@ export function NotificationItem({
     notification.type === "App\\Notifications\\AnnouncementNotification";
   const [expanded, setExpanded] = useState(false);
   const config = TYPE_CONFIG[notification.type];
-  const title = getTitle(notification);
-  const preview = getPreview(notification);
+  const title = getNotificationTitle(notification);
+  const preview = getNotificationPreview(notification);
 
   function handleClick() {
     if (isUnread) {
