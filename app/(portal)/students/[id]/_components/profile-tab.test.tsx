@@ -17,6 +17,7 @@ const baseStudent: StudentSummary = {
   branch_name: "Antipolo",
   allergies: null,
   wallet_balance: 500,
+  credit_balance: 0,
   wallet_alert_threshold: 0,
   enrollment_status: "enrolled",
   student_type: "non_subscription",

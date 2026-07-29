@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { ArrowRight, Wallet } from "lucide-react";
+import { AlertTriangle, ArrowRight, Wallet } from "lucide-react";
 
 import { EnrollmentStatusBadge } from "@/components/enrollment-status-badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -73,6 +73,22 @@ function StudentCard({ student }: { student: StudentSummary }) {
             </span>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">Wallet balance</p>
+
+          {/* Only surfaces when money is actually owed, so the usual card is unchanged. */}
+          {student.credit_balance > 0 && (
+            <div className="mt-2">
+              <div className="flex items-center gap-1.5">
+                <AlertTriangle
+                  className="h-4 w-4 text-destructive"
+                  aria-hidden="true"
+                />
+                <span className="text-lg font-bold tabular-nums text-destructive">
+                  {formatPHP(student.credit_balance)}
+                </span>
+              </div>
+              <p className="text-xs text-destructive mt-0.5">Credit owed</p>
+            </div>
+          )}
         </div>
         <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
       </div>

@@ -130,6 +130,27 @@ export function WalletTab({ studentId }: WalletTabProps) {
         </p>
       </div>
 
+      {/*
+        Outstanding credit. Rendered only when money is actually owed, and the copy has to
+        say it cannot be paid online — the portal is read-only and there is no payment
+        flow, so without that line parents have no idea what to do next.
+      */}
+      {!!data && data.credit_balance > 0 && (
+        <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-6">
+          <p className="text-sm font-medium text-destructive">
+            Outstanding Credit
+          </p>
+          <p className="mt-1 text-4xl font-bold tabular-nums text-destructive">
+            {formatPHP(data.credit_balance)}
+          </p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Credit was used at the canteen when the wallet balance ran low.
+            Please settle this at the canteen counter — credit cannot be paid
+            online.
+          </p>
+        </div>
+      )}
+
       {/* Low Balance Alert */}
       <div className="rounded-xl border border-border bg-card p-4">
         <div className="flex items-center justify-between gap-4">

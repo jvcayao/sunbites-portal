@@ -15,6 +15,21 @@ export interface AnnouncementData {
   sent_at: string;
 }
 
+export interface CreditChargedData {
+  student_id: number;
+  student_name: string;
+  amount: number;
+  outstanding_balance: number;
+}
+
+export interface CreditSettledData {
+  student_id: number;
+  student_name: string;
+  amount: number;
+  outstanding_balance: number;
+  was_waived: boolean;
+}
+
 export type ParentNotification =
   | {
       id: string;
@@ -27,6 +42,20 @@ export type ParentNotification =
       id: string;
       type: "App\\Notifications\\AnnouncementNotification";
       data: AnnouncementData;
+      read_at: string | null;
+      created_at: string;
+    }
+  | {
+      id: string;
+      type: "App\\Notifications\\CreditChargedNotification";
+      data: CreditChargedData;
+      read_at: string | null;
+      created_at: string;
+    }
+  | {
+      id: string;
+      type: "App\\Notifications\\CreditSettledNotification";
+      data: CreditSettledData;
       read_at: string | null;
       created_at: string;
     };
