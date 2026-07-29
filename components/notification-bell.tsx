@@ -12,7 +12,11 @@ import {
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { NotificationItem } from "@/components/notification-item";
+import {
+  NotificationItem,
+  getNotificationPreview,
+  getNotificationTitle,
+} from "@/components/notification-item";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -118,9 +122,7 @@ function NotificationDetailSheet({
                 )}
               </div>
               <SheetTitle className="text-left">
-                {isPayment
-                  ? "Payment Reminder"
-                  : (notification.data.title ?? "Announcement")}
+                {getNotificationTitle(notification)}
               </SheetTitle>
               <SheetDescription className="text-left">
                 {new Date(notification.created_at).toLocaleDateString("en-PH", {
@@ -191,11 +193,15 @@ function NotificationDetailSheet({
                     Message
                   </p>
                   <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
-                    {notification.data.message}
+                    {isAnnouncement
+                      ? notification.data.message
+                      : getNotificationPreview(notification)}
                   </p>
-                  <p className="mt-3 text-xs text-muted-foreground">
-                    From: {notification.data.sender_name}
-                  </p>
+                  {isAnnouncement && (
+                    <p className="mt-3 text-xs text-muted-foreground">
+                      From: {notification.data.sender_name}
+                    </p>
+                  )}
                 </>
               )}
             </div>
@@ -287,8 +293,7 @@ function NotificationPanel({
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ["notifications"] });
       const prev = queryClient.getQueryData(["notifications"]) as
-        | NotificationListResponse
-        | undefined;
+        NotificationListResponse | undefined;
       queryClient.setQueryData(
         ["notifications"],
         (old: NotificationListResponse | undefined) => ({
@@ -315,8 +320,7 @@ function NotificationPanel({
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ["notifications"] });
       const prev = queryClient.getQueryData(["notifications"]) as
-        | NotificationListResponse
-        | undefined;
+        NotificationListResponse | undefined;
       queryClient.setQueryData(
         ["notifications"],
         (old: NotificationListResponse | undefined) => ({
@@ -470,8 +474,7 @@ export function NotificationBell({ className }: Props) {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ["notifications"] });
       const prev = queryClient.getQueryData(["notifications"]) as
-        | NotificationListResponse
-        | undefined;
+        NotificationListResponse | undefined;
       queryClient.setQueryData(
         ["notifications"],
         (old: NotificationListResponse | undefined) => ({

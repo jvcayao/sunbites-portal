@@ -8,6 +8,7 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 const mockWallet = {
   balance: 500,
+  credit_balance: 0,
   wallet_alert_threshold: 50,
   data: [
     {
@@ -72,5 +73,59 @@ describe("WalletTab", () => {
     await waitFor(() => {
       expect(capturedUrl).toContain("type=withdraw");
     });
+  });
+});
+
+describe("WalletTab — outstanding credit (spec 14)", () => {
+  function serveWallet(creditBalance: number) {
+    server.use(
+      http.get(`${API}/portal/students/1/wallet`, () =>
+        HttpResponse.json({ ...mockWallet, credit_balance: creditBalance }),
+      ),
+    );
+  }
+
+  it("shows the outstanding credit when the student owes money", async () => {
+    serveWallet(150);
+    render(<WalletTab studentId={1} />);
+
+    expect(await screen.findByText("Outstanding Credit")).toBeInTheDocument();
+    expect(screen.getByText("PHP 150.00")).toBeInTheDocument();
+  });
+
+  it("tells parents it must be settled at the counter and cannot be paid online", async () => {
+    serveWallet(150);
+    render(<WalletTab studentId={1} />);
+
+    expect(
+      await screen.findByText(/credit cannot be paid online/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/canteen counter/i)).toBeInTheDocument();
+  });
+
+  it("hides the credit card entirely when nothing is owed", async () => {
+    serveWallet(0);
+    render(<WalletTab studentId={1} />);
+
+    // Wait for real data before asserting absence, or the assertion would pass merely
+    // because the query had not resolved yet.
+    await waitFor(() =>
+      expect(screen.getAllByText("PHP 500.00").length).toBeGreaterThan(0),
+    );
+    expect(screen.queryByText("Outstanding Credit")).not.toBeInTheDocument();
+  });
+
+  it("still shows the wallet balance alongside the credit card", async () => {
+    serveWallet(150);
+    render(<WalletTab studentId={1} />);
+
+    // Gate on a data-dependent element: the "Current Balance" label renders immediately
+    // with an em dash while the query is still in flight.
+    expect(await screen.findByText("Outstanding Credit")).toBeInTheDocument();
+
+    expect(screen.getByText("Current Balance")).toBeInTheDocument();
+    // The mocked deposit row also renders PHP 500.00, so assert presence, not uniqueness.
+    expect(screen.getAllByText("PHP 500.00").length).toBeGreaterThan(0);
+    expect(screen.getByText("PHP 150.00")).toBeInTheDocument();
   });
 });
