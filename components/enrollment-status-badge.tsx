@@ -22,6 +22,10 @@ const statusConfig: Record<
     className:
       "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
   },
+  unenrolled: {
+    label: "Unenrolled",
+    className: "bg-muted text-muted-foreground",
+  },
   graduated: {
     label: "Graduated",
     className:

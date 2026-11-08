@@ -33,7 +33,8 @@ export interface StudentSummary {
   /** Canteen credit still owed. Zero for the vast majority of students. Spec 14. */
   credit_balance: number;
   wallet_alert_threshold: number;
-  enrollment_status: "enrolled" | "paused" | "graduated" | "banned";
+  enrollment_status:
+    "enrolled" | "paused" | "unenrolled" | "graduated" | "banned";
   student_type: "subscription" | "non_subscription";
   subscription_monthly_status: SubscriptionMonthlyStatus | null;
 }

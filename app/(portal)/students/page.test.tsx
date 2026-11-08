@@ -84,4 +84,17 @@ describe("StudentsPage", () => {
       await screen.findByText("No students linked to your account."),
     ).toBeInTheDocument();
   });
+
+  it("shows an unenrolled student instead of crashing", async () => {
+    server.use(
+      http.get(`${API}/portal/students`, () =>
+        HttpResponse.json({
+          data: [{ ...studentFixture, enrollment_status: "unenrolled" }],
+        }),
+      ),
+    );
+    render(<StudentsPage />);
+    expect(await screen.findByText("Juan Dela Cruz")).toBeInTheDocument();
+    expect(screen.getByText("Unenrolled")).toBeInTheDocument();
+  });
 });
